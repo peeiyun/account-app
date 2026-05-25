@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="記帳本"/>
+<meta name="theme-color" content="#ffffff"/>
+<title>記帳本</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+:root{
+  --bg:#F8F9FC;--bg2:#FFFFFF;--bg3:#F1F3F8;--bg4:#E8EBF4;
+  --accent:#4F46E5;--accent-light:#EEF2FF;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --text:#111827;--text2:#6B7280;--text3:#9CA3AF;
+  --border:#E5E7EB;--shadow:0 1px 3px rgba(0,0,0,.08);
+  --r:16px;--r-sm:10px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;}
+body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;}
+.topbar{background:var(--bg2);padding:12px 20px 10px;padding-top:calc(14px + var(--safe-top));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;box-shadow:var(--shadow);}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.app-icon{width:34px;height:34px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(79,70,229,.35);}
+.topbar-title{font-size:18px;font-weight:700;}
+.topbar-month{display:flex;align-items:center;gap:6px;}
+.month-btn{background:var(--bg3);border:none;color:var(--text2);width:30px;height:30px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.month-lbl{font-size:13px;font-weight:600;color:var(--accent);min-width:68px;text-align:center;}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(80px + var(--safe-bottom));}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);z-index:100;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border:none;background:none;color:var(--text3);font-size:10px;font-family:inherit;cursor:pointer;}
+.nav-btn.active{color:var(--accent);}
+.nav-btn svg{width:22px;height:22px;}
+.page{display:none;padding:16px;}.page.active{display:block;}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.s-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 10px;box-shadow:var(--shadow);}
+.s-lbl{font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:500;letter-spacing:.04em;}
+.s-val{font-size:15px;font-weight:700;}
+.s-val.inc{color:var(--green);}
+.s-val.exp{color:var(--red);}
+.s-val.bal{color:var(--accent);}
+.sec{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;margin-top:20px;}
+.chart-wrap{display:flex;gap:16px;align-items:center;}
+.leg-list{flex:1;display:flex;flex-direction:column;gap:7px;}
+.leg-row{display:flex;align-items:center;gap:7px;font-size:12px;}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.leg-name{flex:1;color:var(--text2);}
+.leg-pct{font-weight:700;color:var(--text);}
+.leg-amt{font-size:11px;color:var(--text3);}
+/* budget items - clickable */
+.bitem{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;transition:background .1s;}
+.bitem:active{background:var(--bg3);}
+.bitem-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.bitem-left{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;}
+.bitem-right{font-size:12px;color:var(--text2);}
+.prog{height:5px;background:var(--bg3);border-radius:99px;overflow:hidden;}
+.prog-f{height:100%;border-radius:99px;transition:width .4s;}
+.bitem-foot{font-size:11px;margin-top:5px;font-weight:500;}
+.bitem-chevron{color:var(--text3);font-size:12px;margin-left:4px;}
+.pill{display:inline-block;font-size:10px;padding:2px 6px;border-radius:99px;font-weight:600;}
+.pill-red{background:var(--red-light);color:var(--red);}
+.pill-amb{background:var(--amber-light);color:var(--amber);}
+.pill-grn{background:var(--green-light);color:var(--green);}
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--bg3);border-radius:var(--r-sm);padding:3px;margin-bottom:16px;border:1px solid var(--border);}
+.type-opt{padding:10px;text-align:center;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text2);font-family:inherit;}
+.type-opt.active{background:var(--bg2);color:var(--accent);box-shadow:var(--shadow);}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500;}
+.field input,.field select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:15px;font-family:inherit;padding:12px 14px;outline:none;-webkit-appearance:none;box-shadow:var(--shadow);}
+.field input:focus,.field select:focus{border-color:var(--accent);}
+.cat-pick-btn{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text2);font-size:15px;font-family:inherit;padding:12px 14px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);}
+.cat-pick-btn.chosen{color:var(--text);}
+.submit-btn{width:100%;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-size:16px;font-weight:700;font-family:inherit;padding:15px;cursor:pointer;margin-top:4px;box-shadow:0 4px 12px rgba(79,70,229,.3);}
+/* history - daily groups */
+.day-group{margin-bottom:14px;}
+.day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:0 2px;}
+.day-date{font-size:13px;font-weight:700;color:var(--text2);}
+.day-total{font-size:12px;font-weight:600;color:var(--red);}
+.tx-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px 14px;box-shadow:var(--shadow);}
+.tx-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.tx-item:last-child{border-bottom:none;}
+.tx-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.tx-info{flex:1;min-width:0;}
+.tx-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.tx-amt{font-size:14px;font-weight:700;white-space:nowrap;}
+.tx-amt.pos{color:var(--green);}
+.tx-amt.neg{color:var(--red);}
+.tx-actions{display:flex;gap:4px;flex-shrink:0;}
+.tx-act{width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.tx-act.edit{background:var(--accent-light);}
+.tx-act.del{background:var(--red-light);}
+.cat-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
+.cat-item-info{flex:1;}
+.cat-item-name{font-size:14px;font-weight:500;}
+.cat-item-bgt{font-size:12px;color:var(--text3);margin-top:2px;}
+.cat-actions{display:flex;gap:6px;}
+.act-btn{padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid;font-family:inherit;}
+.act-edit{background:var(--accent-light);border-color:rgba(79,70,229,.2);color:var(--accent);}
+.act-del{background:var(--red-light);border-color:rgba(220,38,38,.2);color:var(--red);}
+/* budget page total card */
+.bgt-total-card{background:var(--accent);border-radius:var(--r);padding:16px 20px;margin-bottom:4px;color:#fff;box-shadow:0 4px 12px rgba(79,70,229,.3);}
+.bgt-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.bgt-total-lbl{font-size:12px;opacity:.8;font-weight:500;}
+.bgt-total-val{font-size:20px;font-weight:700;}
+.bgt-total-sub{display:flex;gap:16px;margin-top:8px;padding-top:10px;border-top:1px solid rgba(255,255,255,.2);}
+.bgt-sub-item{flex:1;text-align:center;}
+.bgt-sub-lbl{font-size:10px;opacity:.7;margin-bottom:2px;}
+.bgt-sub-val{font-size:14px;font-weight:700;}
+/* overlay / sheet */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.sheet{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px;padding-bottom:calc(24px + var(--safe-bottom));max-height:88vh;overflow-y:auto;}
+.sheet-handle{width:36px;height:4px;background:var(--bg4);border-radius:99px;margin:0 auto 18px;}
+.sheet-title{font-size:17px;font-weight:700;margin-bottom:16px;}
+.sheet-sub{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5;}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.cat-cell{background:var(--bg3);border:2px solid transparent;border-radius:var(--r-sm);padding:12px 6px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.cat-cell.sel{background:var(--accent-light);}
+.cat-cell-ico{font-size:24px;line-height:1;}
+.cat-cell-name{font-size:12px;font-weight:600;text-align:center;}
+.cat-cell-bgt{font-size:10px;color:var(--text3);}
+.cat-cell-rem{font-size:10px;font-weight:700;}
+.sheet-footer{display:flex;gap:8px;margin-top:4px;}
+.sheet-btn{flex:1;padding:14px;border-radius:var(--r-sm);font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:inherit;}
+.sheet-btn.cancel{background:var(--bg3);color:var(--text2);}
+.sheet-btn.confirm{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(79,70,229,.3);}
+.ep-tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:4px;}
+.ep-tabs::-webkit-scrollbar{display:none;}
+.ep-tab{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;flex-shrink:0;background:var(--bg3);color:var(--text2);}
+.ep-tab.active{background:var(--accent);color:#fff;}
+.ep-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
+.ep-btn{border:2px solid transparent;background:var(--bg3);border-radius:8px;padding:7px 4px;cursor:pointer;font-size:22px;line-height:1;text-align:center;}
+.ep-btn.sel{border-color:var(--accent);background:var(--accent-light);}
+.ep-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:var(--r-sm);margin-bottom:14px;}
+.sfield{margin-bottom:12px;}
+.sfield label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500;}
+.sfield input,.sfield select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:14px;font-family:inherit;padding:11px 12px;outline:none;-webkit-appearance:none;}
+.sfield input:focus,.sfield select:focus{border-color:var(--accent);}
+.color-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px;}
+.color-dot{width:100%;aspect-ratio:1;border-radius:50%;cursor:pointer;border:3px solid transparent;}
+.color-dot.sel{border-color:var(--text);}
+.export-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--accent);font-size:14px;font-weight:600;font-family:inherit;padding:12px;cursor:pointer;margin-bottom:16px;box-shadow:var(--shadow);}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--text3);font-size:14px;}
+/* detail sheet tx list */
+.detail-stat{display:flex;gap:8px;margin-bottom:14px;}
+.detail-stat-card{flex:1;background:var(--bg3);border-radius:var(--r-sm);padding:10px 12px;text-align:center;}
+.detail-stat-lbl{font-size:10px;color:var(--text3);margin-bottom:3px;}
+.detail-stat-val{font-size:15px;font-weight:700;}
+/* over alloc sheet */
+.alloc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.alloc-row:last-child{border-bottom:none;}
+.alloc-name{flex:1;font-size:14px;}
+.alloc-input{width:90px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;color:var(--text);text-align:right;}
+.alloc-remain{font-size:20px;font-weight:700;color:var(--red);text-align:center;margin:12px 0 4px;}
+.alloc-remain-lbl{font-size:12px;color:var(--text3);text-align:center;margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="app-icon">💰</div>
+    <div class="topbar-title">記帳本</div>
+  </div>
+  <div class="topbar-month">
+    <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+    <div class="month-lbl" id="month-lbl"></div>
+    <button class="month-btn" onclick="changeMonth(1)">›</button>
+  </div>
+</div>
+
+<div class="content">
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-home">
+    <div class="summary">
+      <div class="s-card"><div class="s-lbl">收入</div><div class="s-val inc" id="ov-inc">NT$0</div></div>
+      <div class="s-card"><div class="s-lbl">支出</div><div class="s-val exp" id="ov-exp">NT$0</div></div>
+      <div class="s-card"><div class="s-lbl">結餘</div><div class="s-val bal" id="ov-bal">NT$0</div></div>
+    </div>
+    <div class="sec">支出分配</div>
+    <div class="chart-wrap">
+      <canvas id="donut" width="120" height="120" style="flex-shrink:0"></canvas>
+      <div class="leg-list" id="legend"></div>
+    </div>
+    <div class="sec">預算狀況 <span style="font-size:10px;color:var(--text3);font-weight:400;letter-spacing:0">（點擊查看明細）</span></div>
+    <div id="budget-status"></div>
+  </div>
+
+  <!-- ADD -->
+  <div class="page" id="page-add">
+    <div class="type-toggle">
+      <button class="type-opt active" id="type-exp" onclick="setType('expense')">💸 支出</button>
+      <button class="type-opt" id="type-inc" onclick="setType('income')">💰 收入</button>
+    </div>
+    <div class="field" id="cat-field">
+      <label>分類</label>
+      <button class="cat-pick-btn" id="cat-pick-btn" onclick="openCatSheet()">請選擇分類...</button>
+    </div>
+    <div class="field">
+      <label>金額（NT$）</label>
+      <input type="number" id="f-amount" placeholder="0" inputmode="numeric"/>
+    </div>
+    <div class="field">
+      <label>日期</label>
+      <input type="date" id="f-date"/>
+    </div>
+    <div class="field">
+      <label>備註（選填）</label>
+      <input type="text" id="f-note" placeholder=""/>
+    </div>
+    <button class="submit-btn" onclick="addTx()">新增紀錄</button>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="page" id="page-hist">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <button class="export-btn" style="margin-bottom:0" onclick="exportExcel()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        匯出 Excel
+      </button>
+      <button class="export-btn" style="margin-bottom:0;color:var(--green)" onclick="document.getElementById('import-file').click()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3" transform="rotate(180 12 12)"/></svg>
+        匯入 Excel
+      </button>
+      <input type="file" id="import-file" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this)"/>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+
+  <!-- BUDGET PAGE -->
+  <div class="page" id="page-budget">
+    <div id="bgt-total-wrap"></div>
+    <div class="sec">各分類預算</div>
+    <div id="bgt-list"></div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="page" id="page-cats">
+    <button class="submit-btn" style="margin-bottom:16px" onclick="openNewCatSheet()">＋ 新增分類</button>
+    <div id="cat-list"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav">
+  <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l9-9 9 9"/><path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/></svg>總覽
+  </button>
+  <button class="nav-btn" id="nav-add" onclick="showPage('add')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>新增
+  </button>
+  <button class="nav-btn" id="nav-hist" onclick="showPage('hist')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/></svg>紀錄
+  </button>
+  <button class="nav-btn" id="nav-budget" onclick="showPage('budget')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>預算
+  </button>
+  <button class="nav-btn" id="nav-cats" onclick="showPage('cats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="9" r="4"/><circle cx="15" cy="15" r="4"/></svg>分類
+  </button>
+</div>
+
+<!-- CAT SELECT SHEET -->
+<div class="overlay" id="cat-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">選擇分類</div>
+    <div class="cat-grid" id="cat-sheet-grid"></div>
+    <div class="sheet-footer">
+      <button class="sheet-btn cancel" onclick="closeCatSheet()">取消</button>
+      <button class="sheet-btn confirm" onclick="confirmCat()">確認</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY DETAIL SHEET -->
+<div class="overlay" id="detail-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div id="detail-title" style="font-size:20px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px"></div>
+    <div id="detail-month" style="font-size:12px;color:var(--text3);margin-bottom:14px"></div>
+    <div class="detail-stat" id="detail-stat"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">明細</div>
+    <div id="detail-txs"></div>
+    <div class="sheet-footer" style="margin-top:16px">
+      <button class="sheet-btn cancel" onclick="closeDetailSheet()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TX SHEET -->
+<div class="overlay" id="edit-tx-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="edit-tx-title">編輯紀錄</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--bg3);border-radius:var(--r-sm);padding:3px;margin-bottom:16px;border:1px solid var(--border);">
+      <button class="type-opt active" id="et-type-exp" onclick="setEditType('expense')">💸 支出</button>
+      <button class="type-opt" id="et-type-inc" onclick="setEditType('income')">💰 收入</button>
+    </div>
+    <div class="sfield" id="et-cat-field">
+      <label>分類</label>
+      <button class="cat-pick-btn" id="et-cat-btn" onclick="openEditCatSheet()" style="background:var(--bg3);box-shadow:none;">請選擇分類...</button>
+    </div>
+    <div class="sfield"><label>金額（NT$）</label><input type="number" id="et-amount" inputmode="numeric"/></div>
+    <div class="sfield"><label>日期</label><input type="date" id="et-date"/></div>
+    <div class="sfield"><label>備註</label><input type="text" id="et-note" placeholder="選填"/></div>
+    <div class="sheet-footer">
+      <button class="sheet-btn cancel" onclick="closeEditTxSheet()">取消</button>
+      <button class="sheet-btn confirm" onclick="saveEditTx()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TX CAT SHEET -->
+<div class="overlay" id="edit-tx-cat-sheet" style="z-index:300;">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">選擇分類</div>
+    <div class="cat-grid" id="et-cat-grid"></div>
+    <div class="sheet-footer">
+      <button class="sheet-btn cancel" onclick="closeEditCatSheet()">取消</button>
+      <button class="sheet-btn confirm" onclick="confirmEditCat()">確認</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVER ALLOC SHEET -->
+<div class="overlay" id="over-alloc-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">超支分攤設定</div>
+    <div class="sheet-sub" id="over-alloc-desc"></div>
+    <div class="alloc-remain" id="over-alloc-remain"></div>
+    <div class="alloc-remain-lbl">剩餘未分配超支金額</div>
+    <div id="over-alloc-rows"></div>
+    <div class="sheet-footer" style="margin-top:12px">
+      <button class="sheet-btn cancel" onclick="closeOverAllocSheet()">取消</button>
+      <button class="sheet-btn confirm" onclick="confirmOverAlloc()">確認分攤</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE CAT SHEET -->
+<div class="overlay" id="manage-cat-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="mc-title">新增分類</div>
+    <div class="sfield"><label>名稱</label><input type="text" id="mc-name" placeholder="例：餐飲"/></div>
+    <div class="sfield"><label>月預算（NT$）</label><input type="number" id="mc-budget" placeholder="0" inputmode="numeric"/></div>
+    <div class="sfield"><label>顏色</label><div class="color-row" id="color-row"></div></div>
+    <div class="sfield">
+      <label>圖示</label>
+      <div class="ep-tabs" id="ep-tabs"></div>
+      <div class="ep-grid" id="ep-grid"></div>
+      <div class="ep-preview"><span style="font-size:28px;line-height:1" id="ep-prev-ico">📁</span><span style="font-size:13px;color:var(--text2)">已選擇圖示</span></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-btn cancel" onclick="closeManageCatSheet()">取消</button>
+      <button class="sheet-btn confirm" onclick="saveCat()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const MONTHS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const fmt=n=>'NT$'+Math.round(Math.abs(n)).toLocaleString();
+const COLORS=['#4F46E5','#16A34A','#DC2626','#D97706','#0891B2','#DB2777','#EA580C','#7C3AED'];
+const EMOJI_CATS=[
+  {l:'飲食',e:['🍜','🍱','🍔','🍕','🍣','🍦','☕','🧋','🍺','🥗','🍲','🥘','🍛','🍤']},
+  {l:'交通',e:['🚌','🚗','🚇','✈️','🚲','🛵','🚕','🚂','⛽','🅿️','🚢','🛺']},
+  {l:'購物',e:['🛍️','👗','👟','💄','👜','🧴','🛒','💍','🎁','🧸','📦','🛋️']},
+  {l:'娛樂',e:['🎮','🎬','🎵','📚','🏊','⚽','🎸','🎲','🎨','🎭','🎤','🏋️']},
+  {l:'生活',e:['🏠','💊','🏥','📱','💡','🔧','🧹','🌿','🐶','📷','🖥️','🛁']},
+  {l:'財務',e:['💰','💳','🏦','📈','💵','🧾','💼','🏷️','📊','💹','🪙','💸']},
+  {l:'其他',e:['📁','⭐','❤️','🌟','🎯','🔑','📝','🌈','🎪','🏆','🧩','🌙']},
+];
+
+let S={
+  cats:[
+    {id:1,name:'餐飲',budget:8000,color:'#4F46E5',emoji:'🍜'},
+    {id:2,name:'交通',budget:3000,color:'#0891B2',emoji:'🚌'},
+    {id:3,name:'娛樂',budget:2000,color:'#DB2777',emoji:'🎮'},
+    {id:4,name:'購物',budget:5000,color:'#D97706',emoji:'🛍️'},
+    {id:5,name:'其他',budget:2000,color:'#7C3AED',emoji:'📦'},
+  ],
+  txs:[],
+  // adjs: { 'catId-YYYY-MM': amount_adjustment }
+  // supports negative (deduction from overspend) spread across months
+  adjs:{},
+  // overAlloc: manual cross-category allocations { 'catId-YYYY-MM': amount }
+  overAlloc:{},
+  y:new Date().getFullYear(),m:new Date().getMonth(),
+  cSeq:6,tSeq:1,
+  txType:'expense',selCat:null,tmpCat:null,
+  editCatId:null,selColor:COLORS[0],selEmoji:'📁',epCat:0,
+  editTxId:null,etType:'expense',etCat:null,etTmpCat:null,
+  overAllocCatId:null, overAllocY:null, overAllocM:null,
+};
+
+function save(){try{localStorage.setItem('bk3',JSON.stringify({cats:S.cats,txs:S.txs,adjs:S.adjs,overAlloc:S.overAlloc,cSeq:S.cSeq,tSeq:S.tSeq}));}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('bk3'));if(d&&d.txs){S.cats=d.cats||S.cats;S.txs=d.txs||[];S.adjs=d.adjs||{};S.overAlloc=d.overAlloc||{};S.cSeq=d.cSeq||S.cSeq;S.tSeq=d.tSeq||S.tSeq;}}catch(e){}}
+load();
+
+if(!S.txs.length){
+  const nm=new Date(),ym=`${nm.getFullYear()}-${String(nm.getMonth()+1).padStart(2,'0')}`;
+  S.txs=[
+    {id:100,type:'expense',amount:2800,date:`${ym}-05`,note:'超市採買',catId:1},
+    {id:101,type:'expense',amount:1200,date:`${ym}-10`,note:'聚餐',catId:1},
+    {id:102,type:'expense',amount:890,date:`${ym}-12`,note:'捷運',catId:2},
+    {id:103,type:'expense',amount:3200,date:`${ym}-15`,note:'網購',catId:4},
+    {id:104,type:'income',amount:45000,date:`${ym}-01`,note:'薪資',catId:null},
+    {id:105,type:'expense',amount:5200,date:`${ym}-20`,note:'餐費',catId:1},
+  ];
+  S.tSeq=200;
+  recomputeAllAdjs();save();
+}
+
+function mk(y,m){return `${y}-${String(m+1).padStart(2,'0')}`;}
+function nextMk(y,m){let ny=y,nm=m+1;if(nm>11){nm=0;ny++;}return mk(ny,nm);}
+function getMonthTxs(y,m){return S.txs.filter(t=>{const d=new Date(t.date);return d.getFullYear()===y&&d.getMonth()===m;});}
+function catSpend(cid,y,m){return getMonthTxs(y,m).filter(t=>t.type==='expense'&&t.catId===cid).reduce((s,t)=>s+t.amount,0);}
+
+// effective budget: base budget + adj from overspend of previous months + cross-category overAlloc deductions
+function effBgt(cid,y,m){
+  const c=S.cats.find(x=>x.id===cid);if(!c)return 0;
+  const key=`${cid}-${mk(y,m)}`;
+  const adj=S.adjs[key]||0; // negative = deduction from previous overspend
+  const oa=S.overAlloc[key]||0; // negative = allocated from this cat to cover another's overspend
+  return c.budget+adj+oa;
+}
+
+// Recompute adjs: overspend spreads across future months until paid off
+// Each month's overspend deducts from that same cat in future months (one month at a time)
+function recomputeAllAdjs(){
+  S.adjs={};
+  // process months in order
+  const allMonths=[...new Set(S.txs.map(t=>t.date.slice(0,7)))].sort();
+  // carry forward per cat
+  const carry={}; // catId -> remaining debt
+  // go through each month that has transactions, plus a few future months to apply carry
+  const processMonths=[...allMonths];
+  // add up to 12 future months to drain carry
+  if(processMonths.length){
+    let last=processMonths[processMonths.length-1];
+    for(let i=0;i<12;i++){
+      const[y2,m2]=[parseInt(last.slice(0,4)),parseInt(last.slice(5,7))-1];
+      last=nextMk(y2,m2);
+      processMonths.push(last);
+    }
+  }
+  processMonths.forEach(mo=>{
+    const[y,m]=[parseInt(mo.slice(0,4)),parseInt(mo.slice(5,7))-1];
+    S.cats.forEach(c=>{
+      // apply carry from previous months
+      const prev=carry[c.id]||0;
+      if(prev<0){
+        // prev is negative debt, apply to this month's adj
+        const key=`${c.id}-${mo}`;
+        // deduct up to the full budget
+        const bgtBase=c.budget+(S.overAlloc[key]||0);
+        const canDeduct=Math.min(-prev,bgtBase); // deduct at most the budget
+        S.adjs[key]=(S.adjs[key]||0)-canDeduct;
+        carry[c.id]=prev+canDeduct; // reduce debt
+      }
+      // compute overspend this month (using effective budget)
+      const sp=catSpend(c.id,y,m);
+      const bgt=effBgt(c.id,y,m);
+      const over=sp-bgt;
+      if(over>0){
+        // add to carry for this cat
+        carry[c.id]=(carry[c.id]||0)-over;
+      }
+    });
+  });
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='add'&&!S.editTxId)resetAddForm();
+  render();
+}
+function changeMonth(d){S.m+=d;if(S.m<0){S.m=11;S.y--;}if(S.m>11){S.m=0;S.y++;}render();}
+
+function drawDonut(data){
+  const cv=document.getElementById('donut'),ctx=cv.getContext('2d'),cx=60,cy=60,r=52,inn=30;
+  ctx.clearRect(0,0,120,120);
+  const tot=data.reduce((s,d)=>s+d.v,0);
+  if(!tot){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle='#E5E7EB';ctx.lineWidth=20;ctx.stroke();return;}
+  let st=-Math.PI/2;
+  data.forEach(d=>{const sl=d.v/tot*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,st,st+sl);ctx.closePath();ctx.fillStyle=d.color;ctx.fill();st+=sl;});
+  ctx.beginPath();ctx.arc(cx,cy,inn,0,Math.PI*2);ctx.fillStyle='#F8F9FC';ctx.fill();
+}
+
+function renderHome(){
+  document.getElementById('month-lbl').textContent=`${S.y}/${MONTHS[S.m]}`;
+  const y=S.y,m=S.m,txs=getMonthTxs(y,m);
+  const inc=txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('ov-inc').textContent=fmt(inc);
+  document.getElementById('ov-exp').textContent=fmt(exp);
+  const b=inc-exp,bEl=document.getElementById('ov-bal');
+  bEl.textContent=(b<0?'-':'')+fmt(b);bEl.style.color=b>=0?'var(--accent)':'var(--red)';
+  const cd=S.cats.map(c=>({name:c.name,v:catSpend(c.id,y,m),color:c.color,emoji:c.emoji}));
+  drawDonut(cd);
+  const tot=cd.reduce((s,d)=>s+d.v,0);
+  document.getElementById('legend').innerHTML=cd.filter(d=>d.v>0).map(d=>`
+    <div class="leg-row">
+      <span class="leg-dot" style="background:${d.color}"></span>
+      <span style="font-size:15px;line-height:1">${d.emoji}</span>
+      <span class="leg-name">${d.name}</span>
+      <span class="leg-amt">${fmt(d.v)}</span>
+      <span class="leg-pct">${Math.round(d.v/tot*100)}%</span>
+    </div>`).join('')||'<div style="color:var(--text3);font-size:13px">本月尚無支出</div>';
+
+  document.getElementById('budget-status').innerHTML=S.cats.map(c=>{
+    const sp=catSpend(c.id,y,m),bgt=effBgt(c.id,y,m),pct=bgt>0?Math.min(sp/bgt*100,100):0,over=sp>bgt&&bgt>0;
+    const adj=S.adjs[`${c.id}-${mk(y,m)}`]||0,rem=bgt-sp;
+    const oa=S.overAlloc[`${c.id}-${mk(y,m)}`]||0;
+    return `<div class="bitem" onclick="openDetailSheet(${c.id})">
+      <div class="bitem-top">
+        <div class="bitem-left">
+          <span style="font-size:20px;line-height:1">${c.emoji}</span>${c.name}
+          ${adj<0?`<span class="pill pill-amb">扣${fmt(-adj)}</span>`:''}
+          ${oa<0?`<span class="pill pill-amb">分攤${fmt(-oa)}</span>`:''}
+          ${over?`<span class="pill pill-red">超標</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="bitem-right">${fmt(sp)}/${fmt(bgt)}</div>
+          <span class="bitem-chevron">›</span>
+        </div>
+      </div>
+      <div class="prog"><div class="prog-f" style="width:${pct}%;background:${over?'var(--red)':c.color}"></div></div>
+      <div class="bitem-foot" style="color:${over?'var(--red)':rem<bgt*.2?'var(--amber)':'var(--green)'}">${over?`超支 ${fmt(-rem)}，下月起扣除`:`剩餘 ${fmt(rem)}`}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBudgetPage(){
+  const y=S.y,m=S.m;
+  const totalBgt=S.cats.reduce((s,c)=>s+c.budget,0);
+  const totalSpend=S.cats.reduce((s,c)=>s+catSpend(c.id,y,m),0);
+  const totalEff=S.cats.reduce((s,c)=>s+effBgt(c.id,y,m),0);
+  const rem=totalEff-totalSpend;
+  document.getElementById('bgt-total-wrap').innerHTML=`
+    <div class="bgt-total-card">
+      <div class="bgt-total-row">
+        <div class="bgt-total-lbl">本月預算總額</div>
+      </div>
+      <div class="bgt-total-val">${fmt(totalEff)}</div>
+      <div class="bgt-total-sub">
+        <div class="bgt-sub-item"><div class="bgt-sub-lbl">基本預算</div><div class="bgt-sub-val">${fmt(totalBgt)}</div></div>
+        <div class="bgt-sub-item"><div class="bgt-sub-lbl">已使用</div><div class="bgt-sub-val">${fmt(totalSpend)}</div></div>
+        <div class="bgt-sub-item"><div class="bgt-sub-lbl">剩餘</div><div class="bgt-sub-val" style="color:${rem<0?'#fca5a5':'#bbf7d0'}">${rem<0?'-':''} ${fmt(rem)}</div></div>
+      </div>
+    </div>`;
+  const tot=totalBgt||1;
+  document.getElementById('bgt-list').innerHTML=S.cats.map(c=>{
+    const sp=catSpend(c.id,y,m),bgt=effBgt(c.id,y,m),pct=bgt>0?Math.min(sp/bgt*100,100):0,over=sp>bgt;
+    const adj=S.adjs[`${c.id}-${mk(y,m)}`]||0;
+    const oa=S.overAlloc[`${c.id}-${mk(y,m)}`]||0;
+    return `<div class="bitem" onclick="openDetailSheet(${c.id})">
+      <div class="bitem-top">
+        <div class="bitem-left">
+          <span style="font-size:20px">${c.emoji}</span>${c.name}
+          ${adj<0?`<span class="pill pill-amb">扣${fmt(-adj)}</span>`:''}
+          ${oa<0?`<span class="pill pill-amb">分攤${fmt(-oa)}</span>`:''}
+          ${over?`<span class="pill pill-red">超標</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="bitem-right">${Math.round(c.budget/tot*100)}%</div>
+          <span class="bitem-chevron">›</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px">
+        <span>基本 ${fmt(c.budget)}</span>
+        <span>實際預算 ${fmt(bgt)}</span>
+      </div>
+      <div class="prog"><div class="prog-f" style="width:${pct}%;background:${over?'var(--red)':c.color}"></div></div>
+      <div class="bitem-foot" style="color:${over?'var(--red)':'var(--text3)'}">已用 ${fmt(sp)} / ${fmt(bgt)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHist(){
+  const y=S.y,m=S.m;
+  const txs=getMonthTxs(y,m).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('hist-list');
+  if(!txs.length){el.innerHTML='<div class="empty">本月尚無紀錄</div>';return;}
+  // group by day
+  const dayMap={};
+  txs.forEach(t=>{if(!dayMap[t.date])dayMap[t.date]=[];dayMap[t.date].push(t);});
+  const days=Object.keys(dayMap).sort().reverse();
+  el.innerHTML=days.map(day=>{
+    const dayTxs=dayMap[day];
+    const dayExp=dayTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+    const dayInc=dayTxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+    const d=new Date(day),weekdays=['日','一','二','三','四','五','六'];
+    const label=`${d.getMonth()+1}月${d.getDate()}日（${weekdays[d.getDay()]}）`;
+    return `<div class="day-group">
+      <div class="day-header">
+        <div class="day-date">${label}</div>
+        <div style="display:flex;gap:8px;font-size:12px;font-weight:600">
+          ${dayInc>0?`<span style="color:var(--green)">+${fmt(dayInc)}</span>`:''}
+          ${dayExp>0?`<span style="color:var(--red)">-${fmt(dayExp)}</span>`:''}
+        </div>
+      </div>
+      <div class="tx-card">${dayTxs.map(t=>{
+        const c=t.catId?S.cats.find(x=>x.id===t.catId):null;
+        return `<div class="tx-item">
+          <div class="tx-ico" style="background:${c?c.color+'18':'#6B728018'}">${c?c.emoji:'💰'}</div>
+          <div class="tx-info">
+            <div class="tx-name">${t.note||(c?c.name:(t.type==='income'?'收入':'其他'))}</div>
+            <div class="tx-meta">${c?c.name:''}</div>
+          </div>
+          <div class="tx-amt ${t.type==='income'?'pos':'neg'}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div>
+          <div class="tx-actions">
+            <button class="tx-act edit" onclick="openEditTxSheet(${t.id})">✏️</button>
+            <button class="tx-act del" onclick="deleteTx(${t.id})">🗑️</button>
+          </div>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCats(){
+  const el=document.getElementById('cat-list');
+  if(!S.cats.length){el.innerHTML='<div class="empty">尚無分類</div>';return;}
+  el.innerHTML=S.cats.map(c=>`
+    <div class="cat-item">
+      <span style="font-size:22px;line-height:1">${c.emoji}</span>
+      <span style="width:9px;height:9px;border-radius:50%;background:${c.color};flex-shrink:0;display:inline-block"></span>
+      <div class="cat-item-info"><div class="cat-item-name">${c.name}</div><div class="cat-item-bgt">月預算 ${fmt(c.budget)}</div></div>
+      <div class="cat-actions">
+        <button class="act-btn act-edit" onclick="openEditCatMgr(${c.id})">編輯</button>
+        <button class="act-btn act-del" onclick="delCat(${c.id})">刪除</button>
+      </div>
+    </div>`).join('');
+}
+
+function render(){renderHome();renderHist();renderCats();renderBudgetPage();}
+
+// DETAIL SHEET
+function openDetailSheet(catId){
+  const y=S.y,m=S.m;
+  const c=S.cats.find(x=>x.id===catId);if(!c)return;
+  const sp=catSpend(c.id,y,m),bgt=effBgt(c.id,y,m),over=sp>bgt;
+  document.getElementById('detail-title').innerHTML=`<span style="font-size:24px">${c.emoji}</span>${c.name}`;
+  document.getElementById('detail-month').textContent=`${y}年${MONTHS[m]}`;
+  document.getElementById('detail-stat').innerHTML=`
+    <div class="detail-stat-card"><div class="detail-stat-lbl">實際預算</div><div class="detail-stat-val" style="color:var(--accent)">${fmt(bgt)}</div></div>
+    <div class="detail-stat-card"><div class="detail-stat-lbl">已花費</div><div class="detail-stat-val" style="color:var(--red)">${fmt(sp)}</div></div>
+    <div class="detail-stat-card"><div class="detail-stat-lbl">${over?'超支':'剩餘'}</div><div class="detail-stat-val" style="color:${over?'var(--red)':'var(--green)'}">${fmt(bgt-sp)}</div></div>`;
+  const txs=getMonthTxs(y,m).filter(t=>t.type==='expense'&&t.catId===catId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!txs.length){document.getElementById('detail-txs').innerHTML='<div class="empty">本月尚無此分類支出</div>';}
+  else{
+    document.getElementById('detail-txs').innerHTML='<div class="tx-card">'+txs.map(t=>`
+      <div class="tx-item">
+        <div class="tx-ico" style="background:${c.color}18">${c.emoji}</div>
+        <div class="tx-info"><div class="tx-name">${t.note||c.name}</div><div class="tx-meta">${t.date}</div></div>
+        <div class="tx-amt neg">-${fmt(t.amount)}</div>
+        <div class="tx-actions">
+          <button class="tx-act edit" onclick="closeDetailSheet();openEditTxSheet(${t.id})">✏️</button>
+          <button class="tx-act del" onclick="closeDetailSheet();deleteTx(${t.id})">🗑️</button>
+        </div>
+      </div>`).join('')+'</div>';
+  }
+  // show over-alloc button if overspent
+  const overAmt=sp-bgt;
+  const existingOA=Object.entries(S.overAlloc).filter(([k])=>k.startsWith(`${catId}-${mk(y,m)}->`)).reduce((s,[,v])=>s+Math.abs(v),0);
+  const remainOver=overAmt-existingOA;
+  if(over&&remainOver>0){
+    document.getElementById('detail-txs').innerHTML+=`<button class="submit-btn" style="margin-top:12px;background:var(--amber)" onclick="closeDetailSheet();openOverAllocSheet(${catId})">設定超支分攤到其他分類 ›</button>`;
+  }
+  document.getElementById('detail-sheet').classList.add('open');
+}
+function closeDetailSheet(){document.getElementById('detail-sheet').classList.remove('open');}
+
+// OVER ALLOC SHEET
+function openOverAllocSheet(catId){
+  const y=S.y,m=S.m;
+  const c=S.cats.find(x=>x.id===catId);
+  const sp=catSpend(c.id,y,m),bgt=effBgt(c.id,y,m),over=Math.max(0,sp-bgt);
+  S.overAllocCatId=catId;S.overAllocY=y;S.overAllocM=m;
+  document.getElementById('over-alloc-desc').textContent=`${c.emoji} ${c.name} 本月超支 ${fmt(over)}，可將部分超支金額分攤到其他分類的下個月預算（即從其他分類下個月預算中扣除）。`;
+  updateOverAllocUI(over);
+  document.getElementById('over-alloc-sheet').classList.add('open');
+}
+function updateOverAllocUI(totalOver){
+  const catId=S.overAllocCatId,y=S.overAllocY,m=S.overAllocM;
+  // read current inputs
+  const rows=document.querySelectorAll('.alloc-input');
+  let allocated=0;
+  rows.forEach(r=>{allocated+=parseFloat(r.value)||0;});
+  const remain=totalOver-allocated;
+  document.getElementById('over-alloc-remain').textContent=(remain<0?'-':'')+fmt(remain);
+  document.getElementById('over-alloc-remain').style.color=remain<0?'var(--green)':'var(--red)';
+  if(!document.getElementById('over-alloc-rows').children.length){
+    const others=S.cats.filter(c=>c.id!==catId);
+    document.getElementById('over-alloc-rows').innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-sm);padding:0 14px;">'+others.map(c=>`
+      <div class="alloc-row">
+        <span style="font-size:18px">${c.emoji}</span>
+        <div class="alloc-name">${c.name}<div style="font-size:10px;color:var(--text3)">下月預算扣除</div></div>
+        <input class="alloc-input" type="number" placeholder="0" inputmode="numeric" data-catid="${c.id}" oninput="recalcAllocRemain(${totalOver})"/>
+      </div>`).join('')+'</div>';
+  }
+}
+function recalcAllocRemain(totalOver){
+  const rows=document.querySelectorAll('.alloc-input');
+  let allocated=0;
+  rows.forEach(r=>{allocated+=parseFloat(r.value)||0;});
+  const remain=totalOver-allocated;
+  document.getElementById('over-alloc-remain').textContent=(remain<0?'-':'')+fmt(remain);
+  document.getElementById('over-alloc-remain').style.color=remain<0?'var(--green)':'var(--red)';
+}
+function confirmOverAlloc(){
+  const catId=S.overAllocCatId,y=S.overAllocY,m=S.overAllocM;
+  const c=S.cats.find(x=>x.id===catId);
+  const sp=catSpend(c.id,y,m),bgt=effBgt(c.id,y,m),over=Math.max(0,sp-bgt);
+  let total=0;
+  const rows=document.querySelectorAll('.alloc-input');
+  const allocs=[];
+  rows.forEach(r=>{
+    const amt=parseFloat(r.value)||0;
+    if(amt>0){allocs.push({catId:parseInt(r.dataset.catid),amt});}
+    total+=amt;
+  });
+  if(total>over){alert(`分攤金額（${fmt(total)}）超過超支額（${fmt(over)}），請調整。`);return;}
+  // apply: next month deduct from those cats
+  let ny=y,nm=m+1;if(nm>11){nm=0;ny++;}
+  const nmo=mk(ny,nm);
+  allocs.forEach(a=>{
+    const k=`${a.catId}-${nmo}`;
+    S.overAlloc[k]=(S.overAlloc[k]||0)-a.amt;
+  });
+  recomputeAllAdjs();save();
+  closeOverAllocSheet();
+  render();
+  alert('分攤設定完成！');
+}
+function closeOverAllocSheet(){
+  document.getElementById('over-alloc-sheet').classList.remove('open');
+  document.getElementById('over-alloc-rows').innerHTML='';
+  S.overAllocCatId=null;
+}
+
+// ADD TX
+function resetAddForm(){
+  S.txType='expense';S.selCat=null;S.tmpCat=null;
+  document.getElementById('type-exp').classList.add('active');
+  document.getElementById('type-inc').classList.remove('active');
+  document.getElementById('cat-field').style.opacity='1';
+  document.getElementById('cat-pick-btn').disabled=false;
+  document.getElementById('cat-pick-btn').textContent='請選擇分類...';
+  document.getElementById('cat-pick-btn').classList.remove('chosen');
+  document.getElementById('f-amount').value='';
+  document.getElementById('f-note').value='';
+  document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
+}
+function setType(t){
+  S.txType=t;
+  document.getElementById('type-exp').classList.toggle('active',t==='expense');
+  document.getElementById('type-inc').classList.toggle('active',t==='income');
+  document.getElementById('cat-field').style.opacity=t==='income'?'0.4':'1';
+  document.getElementById('cat-pick-btn').disabled=t==='income';
+}
+function addTx(){
+  const amt=parseFloat(document.getElementById('f-amount').value);
+  const date=document.getElementById('f-date').value;
+  const note=document.getElementById('f-note').value;
+  if(!amt||amt<=0||!date){alert('請填寫金額與日期');return;}
+  if(S.txType==='expense'&&!S.selCat){alert('請選擇分類');return;}
+  S.txs.push({id:S.tSeq++,type:S.txType,amount:amt,date,note,catId:S.txType==='expense'?S.selCat:null});
+  recomputeAllAdjs();save();resetAddForm();showPage('home');
+}
+
+// EDIT TX
+function openEditTxSheet(id){
+  const t=S.txs.find(x=>x.id===id);if(!t)return;
+  S.editTxId=id;S.etType=t.type;S.etCat=t.catId;S.etTmpCat=t.catId;
+  document.getElementById('et-type-exp').classList.toggle('active',t.type==='expense');
+  document.getElementById('et-type-inc').classList.toggle('active',t.type==='income');
+  document.getElementById('et-cat-field').style.opacity=t.type==='income'?'0.4':'1';
+  document.getElementById('et-cat-btn').disabled=t.type==='income';
+  const c=t.catId?S.cats.find(x=>x.id===t.catId):null;
+  document.getElementById('et-cat-btn').textContent=c?`${c.emoji}  ${c.name}`:'請選擇分類...';
+  document.getElementById('et-cat-btn').classList.toggle('chosen',!!c);
+  document.getElementById('et-amount').value=t.amount;
+  document.getElementById('et-date').value=t.date;
+  document.getElementById('et-note').value=t.note||'';
+  document.getElementById('edit-tx-sheet').classList.add('open');
+}
+function closeEditTxSheet(){document.getElementById('edit-tx-sheet').classList.remove('open');S.editTxId=null;}
+function setEditType(t){
+  S.etType=t;
+  document.getElementById('et-type-exp').classList.toggle('active',t==='expense');
+  document.getElementById('et-type-inc').classList.toggle('active',t==='income');
+  document.getElementById('et-cat-field').style.opacity=t==='income'?'0.4':'1';
+  document.getElementById('et-cat-btn').disabled=t==='income';
+}
+function saveEditTx(){
+  const amt=parseFloat(document.getElementById('et-amount').value);
+  const date=document.getElementById('et-date').value;
+  const note=document.getElementById('et-note').value;
+  if(!amt||amt<=0||!date){alert('請填寫金額與日期');return;}
+  if(S.etType==='expense'&&!S.etCat){alert('請選擇分類');return;}
+  const idx=S.txs.findIndex(x=>x.id===S.editTxId);
+  if(idx>=0)S.txs[idx]={...S.txs[idx],type:S.etType,amount:amt,date,note,catId:S.etType==='expense'?S.etCat:null};
+  recomputeAllAdjs();save();closeEditTxSheet();render();
+}
+function deleteTx(id){
+  if(!confirm('確定刪除這筆紀錄？'))return;
+  S.txs=S.txs.filter(t=>t.id!==id);
+  recomputeAllAdjs();save();render();
+}
+
+// CAT SHEET
+function renderCatSheetGrid(gridId,tmpCat){
+  const y=S.y,m=S.m;
+  document.getElementById(gridId).innerHTML=S.cats.map(c=>{
+    const sp=catSpend(c.id,y,m),bgt=effBgt(c.id,y,m),rem=bgt-sp;
+    const rc=rem<0?'var(--red)':rem<bgt*.2?'var(--amber)':'var(--green)';
+    const sel=tmpCat===c.id;
+    return `<div class="cat-cell${sel?' sel':''}" onclick="tmpSelCat('${gridId}',${c.id})" style="${sel?`border-color:${c.color};`:''}">
+      <span class="cat-cell-ico">${c.emoji}</span>
+      <span class="cat-cell-name">${c.name}</span>
+      <span class="cat-cell-bgt">${fmt(bgt)}</span>
+      <span class="cat-cell-rem" style="color:${rc}">${rem>=0?`剩 ${fmt(rem)}`:`超 ${fmt(-rem)}`}</span>
+    </div>`;
+  }).join('');
+}
+function openCatSheet(){S.tmpCat=S.selCat;renderCatSheetGrid('cat-sheet-grid',S.tmpCat);document.getElementById('cat-sheet').classList.add('open');}
+function closeCatSheet(){document.getElementById('cat-sheet').classList.remove('open');}
+function tmpSelCat(gridId,id){
+  if(gridId==='cat-sheet-grid')S.tmpCat=id;else S.etTmpCat=id;
+  renderCatSheetGrid(gridId,gridId==='cat-sheet-grid'?S.tmpCat:S.etTmpCat);
+}
+function confirmCat(){
+  S.selCat=S.tmpCat;
+  const c=S.cats.find(x=>x.id===S.selCat);
+  const btn=document.getElementById('cat-pick-btn');
+  btn.textContent=c?`${c.emoji}  ${c.name}`:'請選擇分類...';
+  btn.classList.toggle('chosen',!!c);
+  closeCatSheet();
+}
+function openEditCatSheet(){S.etTmpCat=S.etCat;renderCatSheetGrid('et-cat-grid',S.etTmpCat);document.getElementById('edit-tx-cat-sheet').classList.add('open');}
+function closeEditCatSheet(){document.getElementById('edit-tx-cat-sheet').classList.remove('open');}
+function confirmEditCat(){
+  S.etCat=S.etTmpCat;
+  const c=S.cats.find(x=>x.id===S.etCat);
+  const btn=document.getElementById('et-cat-btn');
+  btn.textContent=c?`${c.emoji}  ${c.name}`:'請選擇分類...';
+  btn.classList.toggle('chosen',!!c);
+  closeEditCatSheet();
+}
+
+// EMOJI
+function renderEp(){
+  document.getElementById('ep-tabs').innerHTML=EMOJI_CATS.map((c,i)=>`<button class="ep-tab${i===S.epCat?' active':''}" onclick="switchEpCat(${i})">${c.l}</button>`).join('');
+  document.getElementById('ep-grid').innerHTML=EMOJI_CATS[S.epCat].e.map(e=>`<button class="ep-btn${e===S.selEmoji?' sel':''}" onclick="pickEmoji('${e}')">${e}</button>`).join('');
+  document.getElementById('ep-prev-ico').textContent=S.selEmoji;
+}
+function switchEpCat(i){S.epCat=i;renderEp();}
+function pickEmoji(e){S.selEmoji=e;renderEp();}
+function renderColorRow(){
+  document.getElementById('color-row').innerHTML=COLORS.map(c=>`<div class="color-dot${c===S.selColor?' sel':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
+}
+function pickColor(c){S.selColor=c;renderColorRow();}
+
+// MANAGE CAT
+function openNewCatSheet(){
+  S.editCatId=null;S.selColor=COLORS[0];S.selEmoji='📁';S.epCat=0;
+  document.getElementById('mc-title').textContent='新增分類';
+  document.getElementById('mc-name').value='';document.getElementById('mc-budget').value='';
+  renderColorRow();renderEp();document.getElementById('manage-cat-sheet').classList.add('open');
+}
+function openEditCatMgr(id){
+  const c=S.cats.find(x=>x.id===id);if(!c)return;
+  S.editCatId=id;S.selColor=c.color;S.selEmoji=c.emoji||'📁';S.epCat=0;
+  document.getElementById('mc-title').textContent='編輯分類';
+  document.getElementById('mc-name').value=c.name;document.getElementById('mc-budget').value=c.budget;
+  renderColorRow();renderEp();document.getElementById('manage-cat-sheet').classList.add('open');
+}
+function closeManageCatSheet(){document.getElementById('manage-cat-sheet').classList.remove('open');}
+function saveCat(){
+  const name=document.getElementById('mc-name').value.trim();
+  const budget=parseFloat(document.getElementById('mc-budget').value)||0;
+  if(!name){alert('請輸入名稱');return;}
+  if(S.editCatId){const c=S.cats.find(x=>x.id===S.editCatId);if(c){c.name=name;c.budget=budget;c.color=S.selColor;c.emoji=S.selEmoji;}}
+  else S.cats.push({id:S.cSeq++,name,budget,color:S.selColor,emoji:S.selEmoji});
+  recomputeAllAdjs();save();closeManageCatSheet();render();
+}
+function delCat(id){
+  if(!confirm('確定刪除此分類？'))return;
+  S.cats=S.cats.filter(c=>c.id!==id);
+  S.txs=S.txs.map(t=>t.catId===id?{...t,catId:null}:t);
+  if(S.selCat===id){S.selCat=null;document.getElementById('cat-pick-btn').textContent='請選擇分類...';}
+  recomputeAllAdjs();save();render();
+}
+
+// EXCEL
+function exportExcel(){
+  if(typeof XLSX==='undefined'){alert('請稍候再試');return;}
+  const wb=XLSX.utils.book_new();
+  const r1=[['日期','類型','分類','金額(NT$)','備註']];
+  const y=S.y,m=S.m;
+  getMonthTxs(y,m).sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t=>{
+    const c=t.catId?S.cats.find(x=>x.id===t.catId):null;
+    r1.push([t.date,t.type==='income'?'收入':'支出',c?c.name:'未分類',t.type==='income'?t.amount:-t.amount,t.note||'']);
+  });
+  const inc=getMonthTxs(y,m).filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=getMonthTxs(y,m).filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  r1.push([]);r1.push(['','收入合計','',inc,'']);r1.push(['','支出合計','',-exp,'']);r1.push(['','結餘','',inc-exp,'']);
+  r1.push([]);r1.push(['分類','預算','實際支出','剩餘']);
+  S.cats.forEach(c=>{const sp=catSpend(c.id,y,m),bgt=effBgt(c.id,y,m);r1.push([c.name,bgt,-sp,bgt-sp]);});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(r1),`${mk(y,m)}`);
+  XLSX.writeFile(wb,`記帳_${mk(y,m)}.xlsx`);
+}
+
+// IMPORT EXCEL
+function importExcel(input){
+  const file=input.files[0];if(!file)return;
+  if(typeof XLSX==='undefined'){alert('請稍候再試');return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      let imported=0,skipped=0,newCats=0;
+      // try to find a sheet with transaction data (look for 日期 column)
+      wb.SheetNames.forEach(sheetName=>{
+        const ws=wb.Sheets[sheetName];
+        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        if(!rows.length)return;
+        // find header row (contains 日期)
+        let hIdx=rows.findIndex(r=>r.some(c=>String(c).includes('日期')));
+        if(hIdx<0)return;
+        const header=rows[hIdx].map(c=>String(c).trim());
+        const col={
+          date:header.findIndex(h=>h.includes('日期')),
+          type:header.findIndex(h=>h.includes('類型')),
+          cat:header.findIndex(h=>h.includes('分類')),
+          amt:header.findIndex(h=>h.includes('金額')),
+          note:header.findIndex(h=>h.includes('備註')),
+        };
+        if(col.date<0||col.amt<0)return;
+        for(let i=hIdx+1;i<rows.length;i++){
+          const r=rows[i];
+          if(!r[col.date])continue;
+          const dateRaw=String(r[col.date]).trim();
+          // validate date format YYYY-MM-DD
+          const dateMatch=dateRaw.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+          if(!dateMatch)continue;
+          const date=`${dateMatch[1]}-${String(dateMatch[2]).padStart(2,'0')}-${String(dateMatch[3]).padStart(2,'0')}`;
+          const amtRaw=parseFloat(String(r[col.amt]).replace(/[^0-9.\-]/g,''));
+          if(isNaN(amtRaw)||amtRaw===0)continue;
+          const typeRaw=col.type>=0?String(r[col.type]).trim():'';
+          const type=typeRaw.includes('收入')||amtRaw>0?'income':'expense';
+          const amount=Math.abs(amtRaw);
+          const catName=col.cat>=0?String(r[col.cat]).trim():'';
+          const note=col.note>=0?String(r[col.note]).trim():'';
+          // skip summary rows
+          if(catName==='分類'||catName==='收入合計'||catName==='支出合計'||catName==='結餘')continue;
+          // find or create category
+          let catId=null;
+          if(type==='expense'&&catName&&catName!=='未分類'){
+            let cat=S.cats.find(c=>c.name===catName);
+            if(!cat){
+              // auto-create category
+              cat={id:S.cSeq++,name:catName,budget:5000,color:COLORS[S.cats.length%COLORS.length],emoji:'📁'};
+              S.cats.push(cat);newCats++;
+            }
+            catId=cat.id;
+          }
+          // check duplicate (same date + amount + note)
+          const dup=S.txs.find(t=>t.date===date&&t.amount===amount&&t.type===type&&(t.note||'')===(note||''));
+          if(dup){skipped++;continue;}
+          S.txs.push({id:S.tSeq++,type,amount,date,note,catId});
+          imported++;
+        }
+      });
+      if(imported===0&&skipped===0){
+        alert('找不到可匯入的資料，請確認 Excel 格式是否包含「日期」欄位。');
+      } else {
+        recomputeAllAdjs();save();render();
+        let msg=`匯入完成！共匯入 ${imported} 筆`;
+        if(skipped>0)msg+=`，略過重複 ${skipped} 筆`;
+        if(newCats>0)msg+=`，自動建立 ${newCats} 個新分類`;
+        alert(msg);
+      }
+    }catch(err){
+      alert('匯入失敗，請確認是正確的 Excel 檔案。\n錯誤：'+err.message);
+    }
+    input.value='';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+document.getElementById('edit-tx-cat-sheet').addEventListener('click',function(e){if(e.target===this)closeEditCatSheet();});
+
+document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
+document.getElementById('month-lbl').textContent=`${S.y}/${MONTHS[S.m]}`;
+render();
+</script>
+</body>
+</html>
