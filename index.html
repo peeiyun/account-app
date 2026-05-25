@@ -1007,7 +1007,7 @@ function importExcel(input){
   reader.readAsArrayBuffer(file);
 }
 
-
+['cat-sheet','edit-tx-sheet','manage-cat-sheet','detail-sheet','over-alloc-sheet'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 });
 document.getElementById('edit-tx-cat-sheet').addEventListener('click',function(e){if(e.target===this)closeEditCatSheet();});
