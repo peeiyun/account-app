@@ -406,22 +406,23 @@ let S={
 };
 
 function save(){try{localStorage.setItem('bk3',JSON.stringify({cats:S.cats,txs:S.txs,adjs:S.adjs,overAlloc:S.overAlloc,cSeq:S.cSeq,tSeq:S.tSeq}));}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem('bk3'));if(d&&d.txs){S.cats=d.cats||S.cats;S.txs=d.txs||[];S.adjs=d.adjs||{};S.overAlloc=d.overAlloc||{};S.cSeq=d.cSeq||S.cSeq;S.tSeq=d.tSeq||S.tSeq;}}catch(e){}}
-load();
-
-if(!S.txs.length){
-  const nm=new Date(),ym=`${nm.getFullYear()}-${String(nm.getMonth()+1).padStart(2,'0')}`;
-  S.txs=[
-    {id:100,type:'expense',amount:2800,date:`${ym}-05`,note:'超市採買',catId:1},
-    {id:101,type:'expense',amount:1200,date:`${ym}-10`,note:'聚餐',catId:1},
-    {id:102,type:'expense',amount:890,date:`${ym}-12`,note:'捷運',catId:2},
-    {id:103,type:'expense',amount:3200,date:`${ym}-15`,note:'網購',catId:4},
-    {id:104,type:'income',amount:45000,date:`${ym}-01`,note:'薪資',catId:null},
-    {id:105,type:'expense',amount:5200,date:`${ym}-20`,note:'餐費',catId:1},
-  ];
-  S.tSeq=200;
-  recomputeAllAdjs();save();
+function load(){
+  try{
+    let d=JSON.parse(localStorage.getItem('bk3'));
+    if(!d||!d.txs) d=JSON.parse(localStorage.getItem('bk2'));
+    if(!d||!d.txs) d=JSON.parse(localStorage.getItem('bk'));
+    if(d&&d.txs){
+      S.cats=d.cats||S.cats;
+      S.txs=d.txs||[];
+      S.adjs=d.adjs||{};
+      S.overAlloc=d.overAlloc||{};
+      S.cSeq=d.cSeq||S.cSeq;
+      S.tSeq=d.tSeq||S.tSeq;
+      save();
+    }
+  }catch(e){}
 }
+load();
 
 function mk(y,m){return `${y}-${String(m+1).padStart(2,'0')}`;}
 function nextMk(y,m){let ny=y,nm=m+1;if(nm>11){nm=0;ny++;}return mk(ny,nm);}
