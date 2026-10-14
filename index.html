@@ -462,6 +462,25 @@
     max-width:900px; margin:26px auto 0; padding:0 16px;
   }
   .records h3{ font-size:13px; color:var(--muted); letter-spacing:1px; margin:14px 0 10px; text-transform:uppercase;}
+  .query-box{ background:#fff; border:1px solid var(--line); padding:14px 16px; }
+  .query-grid{ display:grid; grid-template-columns:1fr 1.4fr 1fr; gap:12px; }
+  .q-field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .q-field label{ font-size:12px; color:var(--muted); }
+  .q-field select, .q-field input{ width:100%; box-sizing:border-box; font:inherit; font-size:14px; color:var(--ink, #2b2b2b);
+    padding:7px 9px; border:1px solid var(--line); background:#fff; outline:none; }
+  .q-field select:focus, .q-field input:focus{ border-color:var(--accent); background:var(--accent-soft); }
+  .q-status input{ accent-color:var(--accent); }
+  .q-range-inputs{ display:flex; align-items:center; gap:6px; }
+  .q-range-inputs input{ flex:1; min-width:0; }
+  .query-foot{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:12px; }
+  .q-status{ display:flex; align-items:center; gap:14px; font-size:14px; flex-wrap:wrap; }
+  .q-status label{ display:flex; align-items:center; gap:4px; cursor:pointer; }
+  .q-status-label{ font-size:12px; color:var(--muted); }
+  .q-actions{ display:flex; gap:8px; }
+  .q-hint{ font-size:12px; color:var(--muted); margin:10px 0 0; }
+  .q-result-info{ font-size:13px; color:var(--muted); margin:14px 0 8px; }
+  .q-editlog{ font-size:12px; color:var(--muted); margin-top:3px; }
+  @media (max-width:640px){ .query-grid{ grid-template-columns:1fr; } }
 
   .notif-bar{
     display:flex; align-items:center; gap:16px; flex-wrap:wrap;
@@ -615,7 +634,10 @@
   .cal-days.week-view{ grid-template-columns:repeat(7,1fr); }
   .cal-days.week-view .cal-cell{ min-height:190px; }
   .cal-scope-note{ font-size:12px; color:#2E5AA8; font-weight:600; }
-  .cal-unassigned-toggle{ margin-left:auto; }
+  .cal-tech-filter{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:4px 0 12px; }
+  .cal-tech-filter-label{ font-size:12px; color:var(--muted); margin-right:2px; }
+  .cal-tech-filter button{ padding:6px 16px; font-size:13.5px; background:#fff; }
+  .cal-tech-filter button.on, .cal-tech-filter button.on:hover{ background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
   .cal-chip.cal-chip-unassigned{ background:#F1F1EF; color:var(--muted); }
   .cal-chip.cal-chip-appt{ background:#E4ECF7; color:#2E5AA8; font-weight:700; }
   .cal-chip.cal-chip-dp{ background:#EDE7F6; color:#5B3E9B; }
@@ -650,7 +672,15 @@
     background:#E6E3E2 !important; color:#9A9290 !important; text-decoration:line-through; font-weight:400;
   }
   .cal-chip:hover{ background:var(--accent); color:#fff; }
-  .cal-more{ font-size:10px; color:var(--muted); }
+  .cal-more{ display:block; width:100%; text-align:left; font-size:11px; color:var(--accent-dark); font-weight:600;
+    background:none; border:none; padding:2px 4px; cursor:pointer; }
+  .cal-more:hover{ background:var(--accent-soft); text-decoration:underline; }
+  body.holiday-mode .cal-more{ pointer-events:none; }
+  .cal-day-box{ max-width:440px; width:92vw; max-height:80vh; overflow:auto; }
+  .cal-day-sec{ margin:10px 0; }
+  .cal-day-sec-title{ font-size:12px; color:var(--muted); margin-bottom:6px; }
+  #calDayBody .cal-chip{ font-size:13px; padding:7px 9px; margin-bottom:6px; cursor:pointer; white-space:normal; }
+  .cal-day-sub{ font-size:11.5px; opacity:.75; margin-left:4px; }
   @media (max-width:640px){
     .cal-cell{ min-height:44px; font-size:10px; }
     .cal-chip{ font-size:9px; }
@@ -900,6 +930,22 @@
   .view{ display:none; }
   body.role-submit #submitView{ display:block; }
   body.role-tech #techView{ display:block; }
+  body.role-techlogin #techLoginView{ display:block; }
+  .login-box{
+    max-width:360px; margin:60px auto; background:#fff; border:1px solid var(--line);
+    border-radius:8px; padding:28px 26px; display:flex; flex-direction:column; gap:8px;
+  }
+  .login-icon{ width:64px; height:64px; align-self:center; }
+  .login-box h2{ text-align:center; margin:4px 0 0; font-size:18px; color:var(--ink); }
+  .login-sub{ text-align:center; font-size:12px; color:var(--muted); margin:0 0 8px; }
+  .login-box label{ font-size:12px; font-weight:600; color:var(--muted); }
+  .login-box input{
+    font-family:inherit; font-size:14px; padding:9px 11px; border:1px solid var(--line);
+    border-radius:4px; outline:none;
+  }
+  .login-box input:focus{ border-color:var(--accent); }
+  .login-box button{ padding:10px; font-size:14px; }
+  .login-error{ min-height:18px; font-size:12px; color:var(--danger); }
   body.role-none #roleSelect{ display:block; }
   #roleSelect{ display:none; }
 
@@ -1006,7 +1052,15 @@
     resize:vertical; outline:none;
   }
   .techNote:focus{ border-color:var(--accent); }
-  .tech-note-actions{ display:flex; justify-content:flex-end; margin-top:10px; }
+  .tech-note-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .techDoneBtn{ background:#3E8E6B; color:#fff; border-color:#3E8E6B; font-weight:600; }
+  .techDoneBtn:hover{ background:#2F6F53; border-color:#2F6F53; color:#fff; }
+  .takeBtn{ background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
+  .takeBtn:hover{ background:var(--accent-dark); border-color:var(--accent-dark); color:#fff; }
+  .take-tech-list{ display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 4px; }
+  .take-tech-list button{ flex:1; min-width:110px; padding:12px; font-size:15px; font-weight:600; }
+  .take-tech-list button.is-me{ border-color:var(--accent); color:var(--accent-dark); background:var(--accent-soft); }
+  .take-info{ font-size:13px; color:var(--muted); }
   .techSaveBtn{
     font-family:inherit; font-size:13px; font-weight:700;
     padding:8px 20px; border-radius:8px; border:1px solid var(--accent);
@@ -1035,6 +1089,7 @@
      ============================================================ -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
   const firebaseConfig = {
@@ -1063,11 +1118,6 @@
     newOrder: false          // 送單者新開單（預設關閉，避免吃掉每月額度）
   };
 
-  // 新單通知的收件人
-  const NEW_ORDER_RECIPIENTS = [
-    { name:'堅雯', email:'14652@cych.org.tw' },
-    { name:'姵云', email:'16659@cych.org.tw' }
-  ];
 </script>
 </head>
 <body class="role-none">
@@ -1112,6 +1162,27 @@
       <textarea id="lineMsgText" class="line-msg-text" rows="8"></textarea>
       <div class="modal-actions">
         <button type="button" class="primary" id="lineMsgSend">送出訊息</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="calDayModal" style="display:none;">
+    <div class="modal-box cal-day-box">
+      <h3 id="calDayTitle">當天的單</h3>
+      <div id="calDayBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="ghost" id="calDayClose">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="takeOrderModal" style="display:none;">
+    <div class="modal-box">
+      <h3>接單：是哪位牙技師接的？</h3>
+      <div class="take-info" id="takeOrderInfo"></div>
+      <div class="take-tech-list" id="takeOrderTechs"></div>
+      <div class="modal-actions">
+        <button type="button" class="ghost" id="takeOrderCancel">取消</button>
       </div>
     </div>
   </div>
@@ -1185,6 +1256,25 @@
         <div class="title">我是牙技師</div>
         <div class="desc">接收通知、查看與處理技工單</div>
       </div>
+    </div>
+  </div>
+
+  <div class="view" id="techLoginView">
+    <div class="login-box">
+      <svg class="login-icon" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M30 32 C30 16 44 13 50 19 C56 13 70 16 70 32 C70 47 64 54 62 66 C60 78 54 82 52 72 C50.5 64 50 61 50 61 C50 61 49.5 64 48 72 C46 82 40 78 38 66 C36 54 30 47 30 32 Z" fill="#9ED9CA"/>
+        <line x1="62" y1="86" x2="86" y2="54" stroke="#2E8B72" stroke-width="6" stroke-linecap="round"/>
+        <path d="M86 54 Q92 46 88 40" fill="none" stroke="#2E8B72" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <h2>牙技師登入</h2>
+      <p class="login-sub">送單者不需要登入，請回上一頁選「我是送單者」。</p>
+      <label for="loginAccount">帳號（員編）</label>
+      <input type="text" id="loginAccount" placeholder="例如 14652" autocomplete="username" />
+      <label for="loginPassword">密碼</label>
+      <input type="password" id="loginPassword" autocomplete="current-password" />
+      <div class="login-error" id="loginError"></div>
+      <button type="button" class="primary" id="btnLogin">登入</button>
+      <button type="button" class="ghost" id="btnLoginBack">返回</button>
     </div>
   </div>
 
@@ -1384,6 +1474,10 @@
             <label class="chip chip-sub"><input type="checkbox" data-key="ost_lingual" /><span>LINGUAL</span></label>
           </div>
         </div>
+
+        <div class="item">
+          <label class="chip chip-main"><input type="checkbox" data-key="implant_temp_reglue" /><span>植體temp重黏</span></label>
+        </div>
       </div>
 
       <!-- tooth chart -->
@@ -1438,22 +1532,42 @@
 
   <p class="note-shared">送出後會自動存入共用清單，牙技師端會即時看到並收到通知。</p>
 
-  <div class="records">
-    <div class="collapsible-block" style="margin:0 0 16px;">
-      <details class="calendar-details" open>
-        <summary>日曆（灰底為週末、國定假日與牙技師休假）</summary>
-        <div class="calendar-toolbar">
-          <button type="button" class="ghost" id="calPrevMonthSender">‹ 上個月</button>
-          <span id="calMonthLabelSender" class="calendar-month-label">—</span>
-          <button type="button" class="ghost" id="calNextMonthSender">下個月 ›</button>
-          <button type="button" class="ghost" id="calTodaySender">回到今天</button>
+  <div class="records sender-query">
+    <h3>查詢已送出的單</h3>
+    <div class="query-box">
+      <div class="query-grid">
+        <div class="q-field">
+          <label for="q_doctor">醫師</label>
+          <select id="q_doctor"></select>
         </div>
-        <div class="calendar-grid" id="calendarGridSender"></div>
-      </details>
+        <div class="q-field q-range">
+          <label>開單區間（收件日）</label>
+          <div class="q-range-inputs">
+            <input id="q_from" type="date" />
+            <span>～</span>
+            <input id="q_to" type="date" />
+          </div>
+        </div>
+        <div class="q-field">
+          <label for="q_chartNo">病歷號</label>
+          <input id="q_chartNo" type="text" inputmode="numeric" placeholder="例如 12345" />
+        </div>
+      </div>
+      <div class="query-foot">
+        <div class="q-status">
+          <span class="q-status-label">是否完成</span>
+          <label><input type="checkbox" id="q_undone" checked /> 未完成</label>
+          <label><input type="checkbox" id="q_done" checked /> 已完成</label>
+        </div>
+        <div class="q-actions">
+          <button type="button" class="ghost" id="btnQueryClear">清除</button>
+          <button type="button" class="primary" id="btnQuery">查詢</button>
+        </div>
+      </div>
+      <p class="q-hint">醫師、開單區間、病歷號至少填一項。查到的單可以按「編輯」修改，儲存時需要輸入修改人，並會留下修改紀錄。</p>
     </div>
-
-    <h3>近期送出狀態（唯讀）</h3>
-    <div id="myRecordsList"><div class="rec-empty">載入中…</div></div>
+    <div id="queryResultInfo" class="q-result-info"></div>
+    <div id="queryResults"></div>
   </div>
   </div>
   <!-- /submitView -->
@@ -1471,6 +1585,7 @@
       <button type="button" class="identity-btn" data-name="菁優">菁優</button>
     </span>
     <button type="button" class="ghost" id="btnChangeIdentity" style="display:none;">切換身份</button>
+    <button type="button" class="ghost" id="btnLogout">登出</button>
   </div>
 
   <div class="handoff-banner" id="handoffBanner" style="display:none;"></div>
@@ -1479,6 +1594,13 @@
   <div class="records collapsible-block">
     <details class="calendar-details" open>
       <summary>日曆</summary>
+      <div class="cal-tech-filter" id="calTechFilter">
+        <span class="cal-tech-filter-label">顯示</span>
+        <button type="button" data-v="all" class="on">全部</button>
+        <button type="button" data-v="堅雯">堅雯</button>
+        <button type="button" data-v="菁優">菁優</button>
+        <button type="button" data-v="__none__">未接單</button>
+      </div>
       <div class="calendar-toolbar">
         <button type="button" class="ghost" id="calPrevMonth">‹ 上一頁</button>
         <span id="calMonthLabel" class="calendar-month-label">—</span>
@@ -1491,7 +1613,6 @@
         </select>
         <select id="calDoctorFilter" class="cal-ctl"><option value="">全部醫師</option></select>
         <span class="cal-scope-note" id="calScopeNote"></span>
-        <label class="sound-toggle cal-unassigned-toggle"><input type="checkbox" id="chkCalUnassigned" checked /> 含未處理（未指派）的單</label>
       </div>
       <div class="calendar-grid" id="calendarGrid"></div>
     </details>
@@ -1502,7 +1623,7 @@
       <div class="modal-box-header">
         <h3>單子內容</h3>
         <span class="modal-head-actions">
-          <select id="calOrderStatus" class="statusSel"></select>
+          <button type="button" class="takeBtn" id="calOrderTake" style="display:none;">接單</button>
           <select id="calOrderAssign" class="assignSel"></select>
           <button type="button" class="ghost" id="calOrderEdit">編輯單子內容</button>
           <button type="button" class="ghost" id="calOrderModalClose">關閉</button>
@@ -1518,13 +1639,13 @@
     </div>
     <div class="tech-search-bar">
       <input type="search" id="techSearch" placeholder="搜尋病歷號或患者姓名…" autocomplete="off" />
+      <button type="button" class="primary" id="techSearchBtn">搜尋</button>
       <button type="button" class="ghost" id="techSearchClear">清除</button>
       <span class="tech-search-note" id="techSearchNote"></span>
     </div>
     <div class="filter-tabs">
       <button class="filter-tab active" data-filter="all">全部 <span class="count">0</span></button>
-      <button class="filter-tab" data-filter="pending">待處理 <span class="count">0</span></button>
-      <button class="filter-tab" data-filter="in_progress">處理中 <span class="count">0</span></button>
+      <button class="filter-tab" data-filter="in_progress">已接單 <span class="count">0</span></button>
       <button class="filter-tab" data-filter="dp">數位規劃 <span class="count">0</span></button>
       <button class="filter-tab" data-filter="done">已完成 <span class="count">0</span></button>
     </div>
@@ -1666,27 +1787,27 @@
 
   // ---- doctor list (grouped dropdown) ----
   const DOCTOR_GROUPS = [
-    { label:'01 牙髓病科', doctors:[
-      {name:'黃薰玉', code:'07114'}, {name:'林佩玉', code:'07183'}, {name:'翁子甯', code:'07317'},
-      {name:'龔俊綺', code:'07697'}, {name:'黃秋碧', code:'07111'}, {name:'廖方圓', code:'07829'},
-      {name:'江典容', code:'07799'}, {name:'陳炯宏', code:'07913'}
+    { label:'01 贗復補綴牙科', doctors:[
+      {name:'周庭暵', code:'07314'}, {name:'張琬婷', code:'07170'}, {name:'許綺真', code:''},
+      {name:'戴晸昆', code:''}, {name:'郭芳妤', code:'07887'}, {name:'顏愉家', code:'07834'},
+      {name:'趙子彤', code:'07877'}
     ]},
     { label:'02 牙周病科', doctors:[
       {name:'鄭嘉瑢', code:'07567'}, {name:'蔡祐年', code:'07634'}, {name:'楊惠敏', code:'07172'},
       {name:'蔡凰慈', code:'07356'}, {name:'林敬偉', code:'07522'}, {name:'陳怡璇', code:'07802'},
       {name:'高聖硯', code:'A08330'}
     ]},
-    { label:'03 贗復補綴牙科', doctors:[
-      {name:'周庭暵', code:'07314'}, {name:'張琬婷', code:'07170'}, {name:'許綺真', code:''},
-      {name:'戴晸昆', code:''}, {name:'郭芳妤', code:'07887'}, {name:'顏愉家', code:'07834'},
-      {name:'趙子彤', code:'07877'}
+    { label:'03 口腔顎面外科', doctors:[
+      {name:'林煥章', code:'02191'}, {name:'董俊良', code:'04899'}, {name:'林蔚庭', code:'07313'},
+      {name:'陳靜容', code:''}, {name:'林立綺', code:''}, {name:'林書輔', code:''}
     ]},
     { label:'04 齒顎矯正科', doctors:[
       {name:'黃奕帛', code:'07318'}, {name:'孫櫻珊', code:'07270'}, {name:'蔡佳君', code:'07462'}
     ]},
-    { label:'05 口腔顎面外科', doctors:[
-      {name:'林煥章', code:'02191'}, {name:'董俊良', code:'04899'}, {name:'林蔚庭', code:'07313'},
-      {name:'陳靜容', code:''}, {name:'林立綺', code:''}, {name:'林書輔', code:''}
+    { label:'05 牙髓病科', doctors:[
+      {name:'黃薰玉', code:'07114'}, {name:'林佩玉', code:'07183'}, {name:'翁子甯', code:'07317'},
+      {name:'龔俊綺', code:'07697'}, {name:'黃秋碧', code:'07111'}, {name:'廖方圓', code:'07829'},
+      {name:'江典容', code:'07799'}, {name:'陳炯宏', code:'07913'}
     ]},
     { label:'06 特殊需求者口腔醫學科', doctors:[
       {name:'劉育嘉', code:'07204'}
@@ -1793,26 +1914,76 @@
   const TECH_NAMES = ['堅雯', '菁優'];
   const TECH_IDENTITY_KEY = 'tech_identity';
   let currentTechIdentity = null;
+  // 牙技師帳號（Firebase Authentication 的 email）→ 姓名
+  const TECH_ACCOUNTS = {
+    '14652@cych.org.tw': '堅雯',
+    '15898@cych.org.tw': '菁優',
+    '16659@cych.org.tw': '姵云'
+  };
+  const LOGIN_DOMAIN = '@cych.org.tw';
+  const auth = firebase.auth();
+  let authUser = null;
+  function techNameOf(user){ return user && user.email ? (TECH_ACCOUNTS[user.email.toLowerCase()] || null) : null; }
+  auth.onAuthStateChanged(user => {
+    authUser = user;
+    const name = techNameOf(user);
+    if(user && !name){                         // 不是牙技師帳號
+      auth.signOut();
+      return;
+    }
+    // 在登入畫面等待時，登入成功就直接進牙技師畫面
+    if(name && document.body.classList.contains('role-techlogin')) enterTechView();
+    // 在牙技師畫面時被登出，就回到登入畫面
+    if(!name && document.body.classList.contains('role-tech')) applyRole('techlogin');
+  });
+  function enterTechView(){
+    applyRole('tech');
+    onRoleActivated('tech');
+  }
+  async function doLogin(){
+    const accEl = document.getElementById('loginAccount');
+    const pwEl = document.getElementById('loginPassword');
+    const errEl = document.getElementById('loginError');
+    let acc = accEl.value.trim().toLowerCase();
+    if(acc && !acc.includes('@')) acc += LOGIN_DOMAIN;   // 只輸入員編也可以
+    errEl.textContent = '';
+    if(!acc || !pwEl.value){ errEl.textContent = '請輸入帳號和密碼'; return; }
+    if(!TECH_ACCOUNTS[acc]){ errEl.textContent = '這個帳號沒有牙技師權限'; return; }
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true; btn.textContent = '登入中…';
+    try{
+      await auth.signInWithEmailAndPassword(acc, pwEl.value);
+      pwEl.value = '';
+    }catch(e){
+      console.error(e);
+      errEl.textContent = (e && (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found'))
+        ? '帳號或密碼錯誤' : (e && e.code === 'auth/too-many-requests' ? '嘗試次數過多，請稍後再試' : '登入失敗，請檢查網路後再試');
+    }finally{
+      btn.disabled = false; btn.textContent = '登入';
+    }
+  }
+  document.getElementById('btnLogin').addEventListener('click', doLogin);
+  document.getElementById('loginPassword').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+  document.getElementById('btnLoginBack').addEventListener('click', () => showRoleSelect());
+  document.getElementById('btnLogout').addEventListener('click', async () => {
+    if(!confirm('確定要登出嗎？')) return;
+    await auth.signOut();
+    showRoleSelect();
+  });
+
   function updateIdentityUI(){
     const label = document.getElementById('techIdentityLabel');
     const picker = document.getElementById('identityPicker');
     const changeBtn = document.getElementById('btnChangeIdentity');
     if(!label || !picker || !changeBtn) return;
-    if(currentTechIdentity){
-      label.textContent = `${currentTechIdentity}（只顯示自己負責與未處理的單）`;
-      picker.style.display = 'none';
-      changeBtn.style.display = 'inline-block';
-    }else{
-      label.textContent = '尚未選擇';
-      picker.style.display = 'inline-flex';
-      changeBtn.style.display = 'none';
-    }
+    picker.style.display = 'none';            // 身份由登入帳號決定，不再手動選
+    changeBtn.style.display = 'none';
+    label.textContent = currentTechIdentity || '未登入';
     // identity affects the calendar and the "my orders" counts, so redraw
     if(document.body.classList.contains('role-tech')) renderTechView();
   }
   function initTechIdentity(){
-    const saved = localGet(TECH_IDENTITY_KEY);
-    currentTechIdentity = (saved && TECH_NAMES.includes(saved)) ? saved : null;
+    currentTechIdentity = techNameOf(authUser);
     updateIdentityUI();
   }
   document.querySelectorAll('.identity-btn').forEach(b => {
@@ -1830,8 +2001,9 @@
   });
 
   function applyRole(role){
-    document.body.classList.remove('role-submit','role-tech','role-none');
-    document.body.classList.add(role === 'submit' ? 'role-submit' : role === 'tech' ? 'role-tech' : 'role-none');
+    document.body.classList.remove('role-submit','role-tech','role-none','role-techlogin');
+    const cls = { submit:'role-submit', tech:'role-tech', techlogin:'role-techlogin' }[role] || 'role-none';
+    document.body.classList.add(cls);
   }
   function showRoleSelect(){
     applyRole('none');
@@ -1842,12 +2014,18 @@
     }catch(e){}
   }
   function chooseRole(role){
-    applyRole(role);
     try{
       const url = new URL(window.location.href);
       url.searchParams.set('role', role);
       history.replaceState(null, '', url.toString());
     }catch(e){}
+    // 牙技師端一定要登入
+    if(role === 'tech' && !techNameOf(authUser)){
+      applyRole('techlogin');
+      setTimeout(() => { const a = document.getElementById('loginAccount'); if(a) a.focus(); }, 50);
+      return;
+    }
+    applyRole(role);
     onRoleActivated(role);
   }
   function onRoleActivated(role){
@@ -1904,7 +2082,8 @@
     { key:'temp_denture', label:'臨時假牙', section:'other', subs:[{key:'temp_shell', label:'SHELL'}, {key:'temp_vacuum', label:'VACUUM 式'}, {key:'temp_other', label:'其他', text:'temp_other_text'}] },
     { key:'ortho_digital', label:'矯正資料數位建檔', section:'other', subs:[{key:'ortho_model', label:'模型'}, {key:'ortho_scan', label:'口掃'}, {key:'ortho_invisalign', label:'傳送隱適美'}] },
     { key:'zirconia', label:'氧化鋯處理', section:'other', subs:[{key:'zirconia_model', label:'有實體模'}, {key:'zirconia_other', label:'其他', text:'zirconia_other_text'}] },
-    { key:'ortho_surgery_template', label:'正顎手術模板', section:'other', subs:[{key:'ost_occlusal', label:'OCCLUSAL'}, {key:'ost_palatal', label:'PALATAL'}, {key:'ost_lingual', label:'LINGUAL'}] }
+    { key:'ortho_surgery_template', label:'正顎手術模板', section:'other', subs:[{key:'ost_occlusal', label:'OCCLUSAL'}, {key:'ost_palatal', label:'PALATAL'}, {key:'ost_lingual', label:'LINGUAL'}] },
+    { key:'implant_temp_reglue', label:'植體temp重黏', section:'other' }
   ];
   function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   function buildOrderSummaryHTML(items){
@@ -2048,6 +2227,8 @@
             <textarea class="techNote" data-id="${r.id}" placeholder="填寫處理備註…">${esc(r.techNote || '')}</textarea>
           </div>
           <div class="tech-note-actions">
+            ${!isDigitalPlan(r) && r.status !== 'done' ? `<button type="button" class="techDoneBtn" data-id="${r.id}">已完成</button>` : ''}
+            ${!isDigitalPlan(r) && r.status === 'done' ? `<button type="button" class="ghost techUndoneBtn" data-id="${r.id}">取消完成（退回已接單）</button>` : ''}
             <button type="button" class="techSaveBtn" data-id="${r.id}">確定</button>
           </div>
         </div>
@@ -2101,6 +2282,8 @@
     const allKeys = new Set([...Object.keys(oldItems), ...Object.keys(newItems)]);
     allKeys.forEach(k => {
       const ov = oldItems[k], nv = newItems[k];
+      const blank = v => v === undefined || v === null || v === '' || v === false;
+      if(blank(ov) && blank(nv)) return; // 空白與未勾選視為相同
       if(JSON.stringify(ov ?? '') !== JSON.stringify(nv ?? '')){
         changes.push(`${itemFieldLabel(k)}：${formatFieldVal(ov)} → ${formatFieldVal(nv)}`);
       }
@@ -2341,7 +2524,7 @@
   document.getElementById('btnPrint').addEventListener('click', () => window.print());
 
   // ---- status labels ----
-  const STATUS_LABEL = { pending:'待處理', in_progress:'處理中', on_hold:'壓單', done:'已完成' };
+  const STATUS_LABEL = { pending:'未接單', in_progress:'已接單', on_hold:'壓單', done:'已完成' };
   const STATUS_CLASS = { pending:'st-pending', in_progress:'st-progress', on_hold:'st-hold', done:'st-done' };
   let currentFilter = 'all';
   let currentSort = 'ts_desc';
@@ -2617,7 +2800,7 @@
     const nonDeleted = cachedRecords.filter(r => !r.deleted && r.status !== 'done' && !isDigitalPlan(r) && matchesSearch(r) && inMyScope(r));
     let filtered = currentFilter === 'all' ? nonDeleted : nonDeleted.filter(r => (r.status||'pending') === currentFilter);
     if(myOrdersOnly) filtered = filtered.filter(r => r.assignedTo === currentTechIdentity);
-    const isDraggableTab = currentFilter === 'pending' || currentFilter === 'in_progress';
+    const isDraggableTab = currentFilter === 'in_progress';
     if(isDraggableTab){
       // in 待處理／處理中, respect manual drag order instead of the sort dropdown
       filtered = filtered.slice().sort((a,b) => {
@@ -2646,12 +2829,7 @@
           <div class="sub">${esc(subLineText(r))}</div>
         </div>
         <div class="rec-actions">
-          ${assigneeSelectHTML(r)}
-          <select class="statusSel" data-id="${r.id}">
-            <option value="pending" ${status==='pending'?'selected':''}>待處理</option>
-            <option value="in_progress" ${status==='in_progress'?'selected':''}>處理中</option>
-            <option value="done" ${status==='done'?'selected':''}>已完成</option>
-          </select>
+          ${takeOrAssignHTML(r)}
           <button data-id="${r.id}" class="editBtnTech">編輯</button>
           <button data-id="${r.id}" class="ghost lineBtn">通知醫師</button>
           <button data-id="${r.id}" class="danger-ghost delBtn">刪除</button>
@@ -2664,7 +2842,10 @@
       listEl.appendChild(div);
     });
     if(isDraggableTab) enableDragReorder(listEl);
-    listEl.querySelectorAll('.assignSel').forEach(s => s.addEventListener('change', () => setAssignee(s.dataset.id, s.value)));
+    listEl.querySelectorAll('.assignSel').forEach(s => s.addEventListener('change', () => {
+      if(!s.value) return releaseOrder(s.dataset.id);   // 選「退回未接單」
+      setAssignee(s.dataset.id, s.value);
+    }));
     listEl.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', () => deleteRecord(b.dataset.id)));
     listEl.querySelectorAll('.statusSel').forEach(s => s.addEventListener('change', () => setStatus(s.dataset.id, s.value)));
     listEl.querySelectorAll('.techSaveBtn').forEach(b => b.addEventListener('click', () => saveTechFieldsFromUI(b.dataset.id)));
@@ -2808,6 +2989,10 @@
       rec.status = 'done';
       doneMonth = d.slice(0, 7);
     }
+    if(turningOff && stepKey === 'done' && rec.status === 'done'){   // 取消「已完成」→ 退回進行中
+      rec.status = 'in_progress';
+      rec.completedDate = null;
+    }
     rec.dpStage = turningOff ? '' : stepKey;                // 再點一次可取消
     if(!turningOff){
       rec.dpStepLog = Object.assign({}, rec.dpStepLog || {}, { [stepKey]: { by: currentTechIdentity || '未選擇身份', ts: Date.now() } });
@@ -2872,6 +3057,14 @@
     function onCancel(){ cleanup(); }
     async function onOk(){
       const to = toSel.value, next = nextSel.value, note = noteEl.value.trim();
+      if(next === 'done'){                                   // 下一步選「已完成」= 直接結案
+        cleanup();
+        const d = await askCompletionDate(rec.completedDate);
+        if(!d) return;
+        rec.completedDate = d;
+        rec.status = 'done';
+        doneMonth = d.slice(0, 7);
+      }
       // 目前這步若已由本人記錄過完成，時間軸就不重複寫
       const curKey = curIdx > -1 ? steps[curIdx].k : '';
       const prevLog = curKey && rec.dpStepLog ? rec.dpStepLog[curKey] : null;
@@ -2885,7 +3078,7 @@
       rec.assignedTo = to;
       rec.assignLog = Array.isArray(rec.assignLog) ? rec.assignLog.slice() : [];
       rec.assignLog.push({ from, to, by: currentTechIdentity, ts: Date.now(), stage: stepLabelOf(rec, next) });
-      rec.handoffPending = to === currentTechIdentity ? null : { to, from: currentTechIdentity, note, ts: Date.now(), step: next };
+      rec.handoffPending = (to === currentTechIdentity || next === 'done') ? null : { to, from: currentTechIdentity, note, ts: Date.now(), step: next };
       pushTimeline(rec, { type:'handoff', to, note, label: doneLabel, next: stepLabelOf(rec, next) });
       cleanup();
       try{ await fsSet(rec.id, rec); }catch(e){ alert('交接失敗，請稍後再試'); }
@@ -2945,10 +3138,8 @@
     try{ await fsSet(id, rec); }catch(e){ alert('儲存失敗'); }
   }
   // 選了身份後，清單只顯示「自己負責」與「未處理（還沒人認領）」的單
-  function inMyScope(r){
-    if(!currentTechIdentity) return true;
-    return r.assignedTo === currentTechIdentity || !r.assignedTo;
-  }
+  // 牙技師可以互相看到對方的單（要只看自己的，用「只看我的單」篩選）
+  function inMyScope(r){ return true; }
   let techSearch = '';
   function matchesSearch(r){
     if(!techSearch) return true;
@@ -2956,6 +3147,54 @@
     return String(r.chartNo || '').toLowerCase().includes(q)
         || String(r.patient || '').toLowerCase().includes(q);
   }
+  // 搜尋：即時篩選，並自動跳到有結果的分頁
+  function applyTechSearch(){
+    const input = document.getElementById('techSearch');
+    const note = document.getElementById('techSearchNote');
+    techSearch = input ? input.value.trim() : '';
+    if(!techSearch){
+      if(note) note.textContent = '';
+      renderTechView();
+      return;
+    }
+    const hit = r => matchesSearch(r) && inMyScope(r);
+    const general = cachedRecords.filter(r => !r.deleted && r.status !== 'done' && !isDigitalPlan(r) && hit(r));
+    const cnt = {
+      all: general.length,
+      pending: general.filter(r => (r.status||'pending') === 'pending').length,
+      in_progress: general.filter(r => r.status === 'in_progress').length,
+      dp: cachedRecords.filter(r => !r.deleted && isDigitalPlan(r) && r.status !== 'done' && hit(r)).length,
+      done: cachedRecords.filter(r => !r.deleted && r.status === 'done' && hit(r)).length
+    };
+    const hist = cachedRecords.filter(r => r.deleted && matchesSearch(r)).length;
+    if(!cnt[currentFilter]){
+      const next = ['all','dp','done'].find(k => cnt[k] > 0);
+      if(next) currentFilter = next;
+    }
+    if(hist > 0 && !cnt.all && !cnt.dp && !cnt.done){
+      const hd = document.querySelector('.history-details');
+      if(hd) hd.open = true;
+    }
+    const parts = [];
+    if(cnt.all) parts.push(`全部（未完成） ${cnt.all}`);
+    if(cnt.dp) parts.push(`數位規劃 ${cnt.dp}`);
+    if(cnt.done) parts.push(`已完成 ${cnt.done}`);
+    if(hist) parts.push(`歷史紀錄 ${hist}`);
+    if(note) note.textContent = parts.length ? '找到：' + parts.join('・') : '找不到符合的單子';
+    renderTechView();
+  }
+  (function bindTechSearch(){
+    const input = document.getElementById('techSearch');
+    if(!input) return;
+    let timer = null;
+    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(applyTechSearch, 150); });
+    input.addEventListener('keydown', e => { if(e.key === 'Enter'){ clearTimeout(timer); applyTechSearch(); } });
+    input.addEventListener('search', () => { clearTimeout(timer); applyTechSearch(); }); // 搜尋框內建的 ✕
+    const sb = document.getElementById('techSearchBtn');
+    if(sb) sb.addEventListener('click', () => { clearTimeout(timer); applyTechSearch(); });
+    const clr = document.getElementById('techSearchClear');
+    if(clr) clr.addEventListener('click', () => { input.value = ''; applyTechSearch(); input.focus(); });
+  })();
   let dpStageFilter = 'all';
   function drawDigitalPlanList(){
     const listEl = document.getElementById('dpList');
@@ -3123,7 +3362,8 @@
   }
   function allDoneRecords(){ return cachedRecords.filter(r => !r.deleted && r.status === 'done' && inMyScope(r)); }
   function doneRecordsForMonth(month){
-    return allDoneRecords().filter(r => doneMonthKey(r) === month && matchesSearch(r)).sort((a,b) => {
+    // 搜尋時不分月份，列出所有符合的已完成單
+    return allDoneRecords().filter(r => (techSearch ? true : doneMonthKey(r) === month) && matchesSearch(r)).sort((a,b) => {
       const da = a.completedDate || '';
       const db = b.completedDate || '';
       if(!da && !db) return (b.ts||0) - (a.ts||0);
@@ -3148,8 +3388,8 @@
     if(!listEl) return;
     refreshDoneMonthOptions();
     const openIds = new Set(Array.from(listEl.querySelectorAll('.rec-details[open]')).map(d => d.dataset.id));
-    const done = doneMonth ? doneRecordsForMonth(doneMonth) : [];
-    if(done.length === 0){ listEl.innerHTML = '<div class="rec-empty">目前沒有已完成的單子</div>'; return; }
+    const done = (doneMonth || techSearch) ? doneRecordsForMonth(doneMonth) : [];
+    if(done.length === 0){ listEl.innerHTML = `<div class="rec-empty">${techSearch ? '沒有符合搜尋的已完成單子' : '目前沒有已完成的單子'}</div>`; return; }
     listEl.innerHTML = '';
     done.slice(0,80).forEach(r => {
       const div = document.createElement('div');
@@ -3164,11 +3404,6 @@
         </div>
         <div class="rec-actions">
           ${assigneeSelectHTML(r)}
-          <select class="statusSel" data-id="${r.id}">
-            <option value="pending">待處理</option>
-            <option value="in_progress">處理中</option>
-            <option value="done" selected>已完成</option>
-          </select>
           <button data-id="${r.id}" class="editBtnTech">編輯</button>
           <button data-id="${r.id}" class="ghost lineBtn">通知醫師</button>
           <button data-id="${r.id}" class="danger-ghost delBtn">刪除</button>
@@ -3415,10 +3650,13 @@
   let calendarViewDate = new Date();
   let calViewMode = 'month';
   let calDoctorFilter = '';
+  let calTechFilter = 'all';
   function refreshCalDoctorOptions(){
     const sel = document.getElementById('calDoctorFilter');
     if(!sel) return;
-    const names = Array.from(new Set(cachedRecords.filter(r => !r.deleted && r.doctor).map(r => r.doctor))).sort();
+    const used = new Set(cachedRecords.filter(r => !r.deleted && r.doctor).map(r => r.doctor));
+    const listed = DOCTOR_GROUPS.flatMap(g => g.doctors.map(d => d.name));   // 依科別順序
+    const names = listed.filter(n => used.has(n)).concat([...used].filter(n => !listed.includes(n)).sort());
     const cur = names.includes(calDoctorFilter) ? calDoctorFilter : '';
     calDoctorFilter = cur;
     const want = ['<option value="">全部醫師</option>']
@@ -3457,20 +3695,22 @@
     }
 
     const dueMap = {};
-    const includeUnassigned = !!(document.getElementById('chkCalUnassigned') || {}).checked;
     const scopeNote = o.scopeNote ? document.getElementById(o.scopeNote) : null;
     if(scopeNote && !document.body.classList.contains('holiday-mode')){
-      scopeNote.textContent = currentTechIdentity ? `只顯示「${currentTechIdentity}」負責的單` : '尚未選擇身份，顯示全部單子';
+      scopeNote.textContent = calTechFilter === 'all' ? '' : (calTechFilter === '__none__' ? '只顯示未接單的單' : `只顯示「${calTechFilter}」負責的單`);
     }
-    const passDoctor = r => !o.editable || !calDoctorFilter || r.doctor === calDoctorFilter;
+    // 牙技師篩選：全部／堅雯／菁優／未接單
+    const passTech = r => {
+      if(!o.editable || calTechFilter === 'all') return true;
+      if(calTechFilter === '__none__') return !r.assignedTo && r.status !== 'done';
+      return r.assignedTo === calTechFilter;
+    };
+    const passDoctor = r => !o.editable || ((!calDoctorFilter || r.doctor === calDoctorFilter) && passTech(r));
     if(o.editable) refreshCalDoctorOptions();
     cachedRecords.filter(r => {
       if(r.deleted || !r.items || !r.items.dueDate) return false;
       if(!passDoctor(r)) return false;
-      if(!o.editable) return true;                 // 送單者畫面：顯示全部
-      if(!currentTechIdentity) return true;
-      if(r.assignedTo === currentTechIdentity) return true;
-      return includeUnassigned && !r.assignedTo;
+      return true;
     }).forEach(r => {
       const d = r.items.dueDate;
       if(!dueMap[d]) dueMap[d] = [];
@@ -3501,6 +3741,7 @@
       });
     }
 
+    calDayData = {};
     let html = '<div class="cal-weekdays">' + ['日','一','二','三','四','五','六'].map(w => `<div>${w}</div>`).join('') + '</div>';
     html += `<div class="cal-days${isWeek ? ' week-view' : ''}">`;
     for(let i = 0; i < leading; i++) html += '<div class="cal-cell empty"></div>';
@@ -3523,16 +3764,12 @@
       if(isLeave) tag = '<span class="cal-holiday-tag">休</span>';
       else if(gov && gov.off && gov.name && !isMakeupHoliday(dateStr)) tag = `<span class="cal-gov-tag">${esc(gov.name)}</span>`;
       const maxChip = isWeek ? 8 : 3;
-      const apptChips = appts.slice(0, isWeek ? 6 : 2).map(a =>
-        `<div class="cal-chip cal-chip-appt${a.r.status==='done' ? ' cal-chip-done' : ''}" data-id="${a.r.id}" title="${esc(a.label)}：${esc(a.r.patient || '')}">約 ${esc(a.r.patient || '(未填)')}${a.label ? '·' + esc(a.label) : ''}</div>`
-      ).join('');
-      const chips = apptChips + orders.slice(0, maxChip).map(x => {
-        const stage = isDigitalPlan(x) ? dpStageLabel(x) : '';
-        const name = esc(x.patient || '(未填)');
-        const text = stage ? `${name}·${esc(stage)}` : name;
-        return `<div class="cal-chip${x.status==='done' ? ' cal-chip-done' : ''}${!x.assignedTo ? ' cal-chip-unassigned' : ''}${stage ? ' cal-chip-dp' : ''}" data-id="${x.id}" title="${esc(x.patient || '')}${stage ? '：' + esc(stage) : ''}">${text}</div>`;
-      }).join('');
-      const more = orders.length > maxChip ? `<div class="cal-more">+${orders.length - maxChip} 筆</div>` : '';
+      const maxAppt = isWeek ? 6 : 2;
+      calDayData[dateStr] = { appts, orders };
+      const chips = appts.slice(0, maxAppt).map(calApptChipHTML).join('')
+        + orders.slice(0, maxChip).map(calOrderChipHTML).join('');
+      const hidden = Math.max(0, appts.length - maxAppt) + Math.max(0, orders.length - maxChip);
+      const more = hidden > 0 ? `<button type="button" class="cal-more" data-date="${dateStr}">+${hidden} 筆</button>` : '';
       html += `<div class="${cellClass}" data-date="${dateStr}"><div class="cal-daynum">${day} ${tag}</div>${chips}${more}</div>`;
     }
     html += '</div>';
@@ -3547,10 +3784,54 @@
         chip.addEventListener('click', () => showCalendarOrderModal(chip.dataset.id));
       });
     }
+    grid.querySelectorAll('.cal-more').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); showCalendarDayModal(btn.dataset.date); });
+    });
   }
+  // ---- 日曆：單張 chip 與「+N 筆」當天清單 ----
+  let calDayData = {};
+  function calApptChipHTML(a){
+    return `<div class="cal-chip cal-chip-appt${a.r.status==='done' ? ' cal-chip-done' : ''}" data-id="${a.r.id}" title="${esc(a.label)}：${esc(a.r.patient || '')}">約 ${esc(a.r.patient || '(未填)')}${a.label ? '·' + esc(a.label) : ''}</div>`;
+  }
+  function calOrderChipHTML(x){
+    const stage = isDigitalPlan(x) ? dpStageLabel(x) : '';
+    const name = esc(x.patient || '(未填)');
+    const text = stage ? `${name}·${esc(stage)}` : name;
+    return `<div class="cal-chip${x.status==='done' ? ' cal-chip-done' : ''}${!x.assignedTo ? ' cal-chip-unassigned' : ''}${stage ? ' cal-chip-dp' : ''}" data-id="${x.id}" title="${esc(x.patient || '')}${stage ? '：' + esc(stage) : ''}">${text}</div>`;
+  }
+  function showCalendarDayModal(dateStr){
+    const data = calDayData[dateStr];
+    if(!data) return;
+    const modal = document.getElementById('calDayModal');
+    const d = new Date(dateStr + 'T00:00:00');
+    document.getElementById('calDayTitle').textContent =
+      `${d.getMonth()+1}月${d.getDate()}日（${'日一二三四五六'[d.getDay()]}）・共 ${data.appts.length + data.orders.length} 筆`;
+    const body = document.getElementById('calDayBody');
+    const sec = (title, list) => list ? `<div class="cal-day-sec"><div class="cal-day-sec-title">${title}</div>${list}</div>` : '';
+    body.innerHTML =
+      sec(`約診（${data.appts.length}）`, data.appts.map(a => {
+        const r = a.r;
+        return calApptChipHTML(a).replace('</div>', ` <span class="cal-day-sub">病歷號 ${esc(r.chartNo || '-')}・${esc(r.doctor || '-')}</span></div>`);
+      }).join(''))
+      + sec(`須完成（${data.orders.length}）`, data.orders.map(r =>
+        calOrderChipHTML(r).replace(/<\/div>$/, ` <span class="cal-day-sub">病歷號 ${esc(r.chartNo || '-')}・${esc(r.doctor || '-')}${r.assignedTo ? '・' + esc(r.assignedTo) : '・未指派'}</span></div>`)
+      ).join(''));
+    body.querySelectorAll('.cal-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        modal.style.display = 'none';
+        showCalendarOrderModal(chip.dataset.id);
+      });
+    });
+    modal.style.display = 'flex';
+  }
+  document.getElementById('calDayClose').addEventListener('click', () => {
+    document.getElementById('calDayModal').style.display = 'none';
+  });
+  document.getElementById('calDayModal').addEventListener('click', e => {
+    if(e.target.id === 'calDayModal') e.target.style.display = 'none';
+  });
   function renderAllCalendars(){
     renderCalendar();
-    renderCalendar({ grid:'calendarGridSender', label:'calMonthLabelSender', editable:false });
   }
   let calModalOrderId = null;
   // 資料更新時，如果彈窗開著就重畫（保留正在輸入的技工備註）
@@ -3579,13 +3860,12 @@
     body.querySelectorAll('.techSaveBtn').forEach(b => b.addEventListener('click', () => saveTechFieldsFromUI(b.dataset.id)));
     bindDpHandlers(body);
     // 標題列：狀態與負責人可直接改
-    const st = rec.status || 'pending';
-    const stSel = document.getElementById('calOrderStatus');
-    stSel.innerHTML = [['pending','待處理'], ['in_progress','處理中'], ['done','已完成']]
-      .map(([v, t]) => `<option value="${v}" ${st===v?'selected':''}>${t}</option>`).join('');
-    stSel.onchange = () => setStatus(id, stSel.value);
-    stSel.style.display = isDigitalPlan(rec) ? 'none' : '';   // 數位規劃用流程步驟管理，不需要狀態選單
+    const needTake = !isDigitalPlan(rec) && (rec.status || 'pending') === 'pending';
+    const takeBtn = document.getElementById('calOrderTake');
+    takeBtn.style.display = needTake ? '' : 'none';
+    takeBtn.onclick = () => openTakeOrderModal(id);
     const asSel = document.getElementById('calOrderAssign');
+    asSel.style.display = needTake ? 'none' : '';
     const av = rec.assignedTo || '';
     asSel.innerHTML = ['<option value="">未處理</option>']
       .concat(TECH_NAMES.map(n => `<option value="${n}" ${av===n?'selected':''}>${n}</option>`)).join('');
@@ -3620,8 +3900,11 @@
     }
     renderAllCalendars();
   });
-  const chkCalUnassignedEl = document.getElementById('chkCalUnassigned');
-  if(chkCalUnassignedEl) chkCalUnassignedEl.addEventListener('change', () => renderCalendar());
+  document.querySelectorAll('#calTechFilter button').forEach(btn => btn.addEventListener('click', () => {
+    calTechFilter = btn.dataset.v;
+    document.querySelectorAll('#calTechFilter button').forEach(b => b.classList.toggle('on', b === btn));
+    renderAllCalendars();
+  }));
   const calViewModeEl = document.getElementById('calViewMode');
   if(calViewModeEl) calViewModeEl.addEventListener('change', e => { calViewMode = e.target.value; renderAllCalendars(); });
   const calDoctorFilterEl = document.getElementById('calDoctorFilter');
@@ -3734,6 +4017,88 @@
     }
   }
 
+  // ---- 接單 / 已完成（取代原本的狀態下拉選單）----
+  function takeOrAssignHTML(r){
+    const st = r.status || 'pending';
+    if(st === 'pending') return `<button type="button" class="takeBtn" data-id="${r.id}">接單</button>`;
+    const val = r.assignedTo || '';
+    const opts = ['<option value="">退回未接單</option>']
+      .concat(TECH_NAMES.map(n => `<option value="${n}" ${val===n?'selected':''}>${n}</option>`));
+    if(val && !TECH_NAMES.includes(val)) opts.push(`<option value="${esc(val)}" selected>${esc(val)}</option>`);
+    return `<select class="assignSel" data-id="${r.id}" title="轉給其他牙技師">${opts.join('')}</select>`;
+  }
+  let takeOrderId = null;
+  function openTakeOrderModal(id){
+    const rec = cachedRecords.find(x => x.id === id);
+    if(!rec) return;
+    takeOrderId = id;
+    document.getElementById('takeOrderInfo').textContent =
+      `${rec.patient || '(未填患者)'}・病歷號 ${rec.chartNo || '-'}・${checkedMainItems(rec.items || {}).join('、') || '技工單'}`;
+    const box = document.getElementById('takeOrderTechs');
+    box.innerHTML = TECH_NAMES.map(n =>
+      `<button type="button" data-name="${n}" class="${n === currentTechIdentity ? 'is-me' : ''}">${n}${n === currentTechIdentity ? '（我）' : ''}</button>`).join('');
+    box.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      document.getElementById('takeOrderModal').style.display = 'none';
+      takeOrder(takeOrderId, b.dataset.name);
+    }));
+    document.getElementById('takeOrderModal').style.display = 'flex';
+  }
+  document.getElementById('takeOrderCancel').addEventListener('click', () => {
+    document.getElementById('takeOrderModal').style.display = 'none';
+  });
+  async function takeOrder(id, name){
+    const rec = cachedRecords.find(x => x.id === id);
+    if(!rec || !name) return;
+    const from = rec.assignedTo || '未處理';
+    rec.assignLog = Array.isArray(rec.assignLog) ? rec.assignLog.slice() : [];
+    rec.assignLog.push({ from, to: name, by: currentTechIdentity || name, ts: Date.now(), stage: '接單' });
+    rec.assignedTo = name;
+    rec.status = 'in_progress';
+    rec.takenAt = Date.now();
+    try{ await fsSet(id, rec); }catch(e){ alert('接單失敗，請確認網路連線'); }
+  }
+  async function releaseOrder(id){
+    const rec = cachedRecords.find(x => x.id === id);
+    if(!rec) return;
+    if(!confirm('確定要把這張單退回「待處理（未接單）」嗎？')){ renderTechView(); return; }
+    rec.assignLog = Array.isArray(rec.assignLog) ? rec.assignLog.slice() : [];
+    rec.assignLog.push({ from: rec.assignedTo || '未處理', to: '未處理', by: currentTechIdentity || '未知', ts: Date.now(), stage: '退回未接單' });
+    rec.assignedTo = null;
+    rec.status = 'pending';
+    rec.takenAt = null;
+    try{ await fsSet(id, rec); }catch(e){ alert('更新失敗'); }
+  }
+  async function markDoneFromNote(id){
+    const rec = cachedRecords.find(x => x.id === id);
+    if(!rec) return;
+    // 一併存下目前輸入中的技工備註
+    const btn = document.querySelector(`.techDoneBtn[data-id="${id}"]`);
+    const sec = btn ? btn.closest('.tech-note-section') : null;
+    const note = sec ? sec.querySelector('.techNote') : null;
+    if(note) rec.techNote = note.value;
+    if(!rec.assignedTo && currentTechIdentity && TECH_NAMES.includes(currentTechIdentity)){
+      rec.assignLog = Array.isArray(rec.assignLog) ? rec.assignLog.slice() : [];
+      rec.assignLog.push({ from:'未處理', to: currentTechIdentity, by: currentTechIdentity, ts: Date.now(), stage:'完成時自動帶入' });
+      rec.assignedTo = currentTechIdentity;
+    }
+    await setStatus(id, 'done');
+  }
+  async function undoDone(id){
+    if(!confirm('確定要取消完成，把這張單退回「已接單」嗎？')) return;
+    const rec = cachedRecords.find(x => x.id === id);
+    if(!rec) return;
+    rec.completedDate = null;
+    await setStatus(id, 'in_progress');
+  }
+  // 事件委派：清單、已完成分頁、日曆彈窗都適用
+  document.addEventListener('click', e => {
+    const t = e.target.closest('.takeBtn[data-id], .techDoneBtn, .techUndoneBtn');
+    if(!t) return;
+    if(t.classList.contains('takeBtn')) openTakeOrderModal(t.dataset.id);
+    else if(t.classList.contains('techDoneBtn')) markDoneFromNote(t.dataset.id);
+    else undoDone(t.dataset.id);
+  });
+
   async function setAssignee(id, name){
     const rec = cachedRecords.find(x => x.id === id);
     if(!rec) return;
@@ -3749,19 +4114,84 @@
     try{ await fsSet(id, rec); }catch(e){ alert('指派失敗'); }
   }
 
-  function renderMySubmissions(){
-    const listEl = document.getElementById('myRecordsList');
-    const active = cachedRecords.filter(r => !r.deleted);
-    if(active.length === 0){ listEl.innerHTML = '<div class="rec-empty">尚無紀錄</div>'; return; }
+  // ---- 送單者：查詢已送出的單 ----
+  let lastQuery = null; // 最近一次查詢條件；資料更新時自動重查
+  function populateQueryDoctorSelect(){
+    const sel = document.getElementById('q_doctor');
+    if(!sel) return;
+    let html = '<option value="">全部醫師</option>';
+    DOCTOR_GROUPS.forEach(g => {
+      html += `<optgroup label="${g.label}">`;
+      g.doctors.forEach(d => { html += `<option value="${d.name}">${d.name}${d.code ? `（${d.code}）` : ''}</option>`; });
+      html += '</optgroup>';
+    });
+    // 名單外（自行填寫）的醫師，從既有單子補進來
+    const known = new Set(DOCTOR_GROUPS.flatMap(g => g.doctors.map(d => d.name)));
+    const extra = [...new Set(cachedRecords.map(r => r.doctor).filter(n => n && !known.has(n)))].sort();
+    if(extra.length){
+      html += '<optgroup label="其他">' + extra.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('') + '</optgroup>';
+    }
+    const keep = sel.value;
+    sel.innerHTML = html;
+    sel.value = keep;
+    if(sel.value !== keep) sel.value = '';
+  }
+  function readQueryForm(){
+    const chartEl = document.getElementById('q_chartNo');
+    const rawChart = chartEl.value.trim();
+    const chartNo = rawChart ? normalizeChartNo(rawChart) : '';
+    if(rawChart) chartEl.value = chartNo;
+    return {
+      doctor: document.getElementById('q_doctor').value,
+      from: document.getElementById('q_from').value,
+      to: document.getElementById('q_to').value,
+      chartNo,
+      undone: document.getElementById('q_undone').checked,
+      done: document.getElementById('q_done').checked
+    };
+  }
+  function runQuery(q){
+    const infoEl = document.getElementById('queryResultInfo');
+    const listEl = document.getElementById('queryResults');
+    if(!infoEl || !listEl) return;
+    if(!q){ infoEl.textContent = ''; listEl.innerHTML = ''; return; }
+    let from = q.from, to = q.to;
+    if(from && to && from > to){ const t = from; from = to; to = t; }
+    const res = cachedRecords.filter(r => {
+      if(r.deleted) return false;
+      const isDone = (r.status || 'pending') === 'done';
+      if(isDone && !q.done) return false;
+      if(!isDone && !q.undone) return false;
+      if(q.doctor && (r.doctor || '') !== q.doctor) return false;
+      if(q.chartNo && normalizeChartNo(r.chartNo || '') !== q.chartNo) return false;
+      if(from || to){
+        const d = r.receiveDate || (r.ts ? new Date(r.ts - new Date(r.ts).getTimezoneOffset()*60000).toISOString().slice(0,10) : '');
+        if(!d) return false;
+        if(from && d < from) return false;
+        if(to && d > to) return false;
+      }
+      return true;
+    }).sort((a, b) => ((b.receiveDate || '').localeCompare(a.receiveDate || '')) || ((b.ts || 0) - (a.ts || 0)));
+    infoEl.textContent = `找到 ${res.length} 筆`;
+    if(res.length === 0){ listEl.innerHTML = '<div class="rec-empty">沒有符合條件的單子</div>'; return; }
     listEl.innerHTML = '';
-    active.slice(0,5).forEach(r => {
+    res.forEach(r => {
       const status = r.status || 'pending';
+      const items = checkedMainItems(r.items || {}).join('、');
+      const due = r.items && r.items.dueDate;
+      const log = Array.isArray(r.editLog) && r.editLog.length ? r.editLog[r.editLog.length - 1] : null;
       const div = document.createElement('div');
       div.className = 'rec ' + assigneeColorClass(r);
       div.innerHTML = `<div class="meta">
-          <span class="status-badge ${STATUS_CLASS[status]}">${STATUS_LABEL[status]}</span>
-          <b>${r.patient || '(未填患者)'}</b> ・ 病歷號 ${r.chartNo || '-'}
-          <div class="sub">${esc(subLineText(r))}</div>
+          <span class="status-badge ${STATUS_CLASS[status] || ''}">${STATUS_LABEL[status] || status}</span>
+          ${r.rush ? '<span class="badge-rush">急件</span>' : ''}
+          <b>${esc(r.patient || '(未填患者)')}</b> ・ 病歷號 ${esc(r.chartNo || '-')}
+          ${items ? ` ・ ${esc(items)}` : ''}
+          <div class="sub">${esc(`收件日 ${r.receiveDate || '-'} ・ 醫師 ${r.doctor || '-'}`
+            + (due ? ` ・ 完成日 ${due}` : '')
+            + (r.completedDate ? ` ・ 實際完成 ${r.completedDate}` : '')
+            + (r.assignedTo ? ` ・ 牙技師 ${r.assignedTo}` : ''))}</div>
+          ${log ? `<div class="q-editlog">最後修改：${esc(log.editor || '')}・${new Date(log.ts).toLocaleString('zh-TW')}（共 ${r.editLog.length} 次）</div>` : ''}
         </div>
         <div class="rec-actions">
           <button data-id="${r.id}" class="editBtn">編輯</button>
@@ -3770,6 +4200,30 @@
     });
     listEl.querySelectorAll('.editBtn').forEach(b => b.addEventListener('click', () => startEditRecord(b.dataset.id)));
   }
+  function renderMySubmissions(){ // 資料更新時：刷新醫師選單、重跑上次查詢
+    populateQueryDoctorSelect();
+    runQuery(lastQuery);
+  }
+  (function bindQueryUI(){
+    const btn = document.getElementById('btnQuery');
+    if(!btn) return;
+    populateQueryDoctorSelect();
+    btn.addEventListener('click', () => {
+      const q = readQueryForm();
+      if(!q.doctor && !q.from && !q.to && !q.chartNo){ alert('請至少選擇一個查詢條件：醫師、開單區間或病歷號。'); return; }
+      if(!q.undone && !q.done){ alert('請至少勾選「未完成」或「已完成」其中一項。'); return; }
+      lastQuery = q;
+      runQuery(q);
+    });
+    document.getElementById('q_chartNo').addEventListener('keydown', e => { if(e.key === 'Enter') btn.click(); });
+    document.getElementById('btnQueryClear').addEventListener('click', () => {
+      ['q_doctor','q_from','q_to','q_chartNo'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('q_undone').checked = true;
+      document.getElementById('q_done').checked = true;
+      lastQuery = null;
+      runQuery(null);
+    });
+  })();
 
   async function deleteRecord(id){
     if(!confirm('確定要把這筆單移到「歷史紀錄」嗎？之後可以再從歷史紀錄還原。')) return;
@@ -4042,11 +4496,29 @@
   const OLD_I_STAGE_MAP = { ct:'planwait', plan:'plandone' };
   function handleRecordsUpdate(recs){
     cachedRecords = recs;
-    recs.forEach(r => {
+    if(techNameOf(authUser)) recs.forEach(r => {
+      if(r.deleted) return;
+      let changed = false;
       if(r.dpFlow === 'I' && OLD_I_STAGE_MAP[r.dpStage]){
         r.dpStage = OLD_I_STAGE_MAP[r.dpStage];
-        fsSet(r.id, r).catch(e => console.error(e));
+        changed = true;
       }
+      // 數位規劃已到「已完成」步驟 → 整張單標成已完成，移到已完成分頁
+      if(isDigitalPlan(r) && r.dpStage === 'done' && r.status !== 'done'){
+        r.status = 'done';
+        if(!r.completedDate){
+          const log = r.dpStepLog && r.dpStepLog.done;
+          const d = new Date(log && log.ts ? log.ts : Date.now());
+          r.completedDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+        changed = true;
+      }
+      // 已經有負責人的一般單 → 視為已接單
+      if(!isDigitalPlan(r) && (r.status || 'pending') === 'pending' && r.assignedTo){
+        r.status = 'in_progress';
+        changed = true;
+      }
+      if(changed) fsSet(r.id, r).catch(e => console.error(e));
     });
     if(lastKnownSeenTs === null){
       const stored = parseInt(localGet(LAST_SEEN_KEY), 10);
